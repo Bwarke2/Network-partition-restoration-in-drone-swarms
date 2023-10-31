@@ -137,6 +137,9 @@ public class Communication : MonoBehaviour
                 //Debug.Log("Recieved bit from: " + sender_id + " with value: " + value);
                 Recieving_node.ReturnBitMsgHandler(sender_id, value);
                 break;
+            case MsgTypes.Broadcast_WinnerMsg:
+                Recieving_node.BroadcastWinnerMsgHandler(sender_id, value);
+                break;
         }
     }
 

@@ -13,8 +13,7 @@ public class Node : MonoBehaviour
     public Transform Target = null;   //Target node position
     public Vector2 RP;       //Rendezvous Point
     public float Bat = 100;         //Battery
-    private int L_id = 0;            //Leader ID
-    private int Term = 0;            //Term
+    
     
     //Communication attributes
     private Communication _com;
@@ -23,6 +22,8 @@ public class Node : MonoBehaviour
     //Leader attributes
     public List<Transform> Unreached_Targets = new List<Transform>();         //Number of unreached targets
     private TaskAssignmnet _TaskAssignment = new TaskAssignmnet();
+
+    private LeaderElection _leaderElection = new LeaderElection();
 
     //Constants
     public const float com_range = 10;         //Communication range
@@ -38,6 +39,7 @@ public class Node : MonoBehaviour
         _swarm = GameObject.FindGameObjectWithTag("Swarm").GetComponent<Swarm>();
         _com = GetComponent<Communication>();
         _TaskAssignment.Setup(_com);
+        _leaderElection.Startup(_com);
     }
 
     void Start()
@@ -46,10 +48,10 @@ public class Node : MonoBehaviour
         if (name == "Node_leader")
         {
             Debug.Log("Running leader code");
-            L_id = ID;
+            _leaderElection.LeaderStart(ID);
+            _leaderElection.StartElection(_swarm.GetMembers());
             _swarm.Leader = this;
             _com.FindHopsToLeader();
-            Broadcast_Winner(Term + 1);
             foreach (GameObject go in GameObject.FindGameObjectsWithTag("Target"))
                 Unreached_Targets.Add(go.transform);
 
@@ -135,23 +137,10 @@ public class Node : MonoBehaviour
         {
             string value = JsonConvert.SerializeObject(Target.gameObject.name);
             Target = null;
-            _com.SendMsg(this, MsgTypes.TargetReachedMsg, L_id, value);
+            _com.SendMsg(this, MsgTypes.TargetReachedMsg, _leaderElection.GetLeaderID(), value);
             return true;
         }
         return false;
-    }
-
-    public void StartElection()
-    {
-        //Start election
-        Term = Term + 1;
-        //Broadcast result
-        Broadcast_Winner(Term);
-    }
-
-    public void Vote()
-    {
-        //Vote for leader
     }
 
     public void SendRP()
@@ -173,26 +162,7 @@ public class Node : MonoBehaviour
         }
     }
 
-    private void Broadcast_Winner(int new_term)
-    {
-        //Debug.Log("Broadcasting winner");
-        if (new_term <= Term)
-        {
-            return;
-        }
-        Term = new_term;
-        
-        //Debug.Log("New leader in " + name + " is: " + L_id);
-        //Broadcast winner to neighbours
-        foreach (Node node in _swarm.GetMembers())
-        {
-            //Change this later to send messages instead of changing variables
-            node.L_id = L_id;
-            //Debug.Log("Broadcasting winner to: " + node.name);
-            node.Broadcast_Winner(new_term);
-            //Debug.Log("Node " + ID + " broadcasting winner: " + L_id + " with term: " + Term);
-        }
-    }
+    
 
     public void SetTarget(Transform target, int node_id)
     {
@@ -217,7 +187,7 @@ public class Node : MonoBehaviour
 
     public void TargetReachedMsgHandler(int sender_id, string value)
     {
-        if (ID == L_id)
+        if (ID == _leaderElection.GetLeaderID())
         {
             Transform target_reached = GameObject.Find(JsonConvert.DeserializeObject<string>(value)).transform;
             _TaskAssignment.Pursuing_Targets.Remove(target_reached);
@@ -245,5 +215,11 @@ public class Node : MonoBehaviour
     public void ReturnBitMsgHandler(int sender_id, string value)
     {
         _TaskAssignment.AddBid(sender_id, JsonConvert.DeserializeObject<float>(value));
+    }
+
+    public void BroadcastWinnerMsgHandler(int sender_id, string value)
+    {
+        Debug.Log("Recieved broadcast winner msg");
+        _leaderElection.HandleBroadcastWinnerMsg(sender_id, value);
     }
 }

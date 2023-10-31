@@ -4,6 +4,7 @@
         SetTargetMsg,
         TargetReachedMsg,
         SetRPMsg,
+        Broadcast_WinnerMsg,
         RollCallMsg,
         RollCallResponseMsg,
         AnounceAuctionMsg,
