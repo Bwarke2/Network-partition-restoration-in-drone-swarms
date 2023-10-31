@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using Newtonsoft.Json;
 
-using Nodes;
 public class Node : MonoBehaviour
 {
     public int ID = 0;        //Node ID
@@ -29,6 +28,8 @@ public class Node : MonoBehaviour
     public List<Transform> Unreached_Targets = new List<Transform>();         //Number of unreached targets
     public List<Transform> Pursuing_Targets = new List<Transform>();         //Number of reached targets
     private IDictionary<int, float> Bids = new Dictionary<int, float>();
+
+    private TaskAssignmnet _TaskAssignment = new TaskAssignmnet();
 
     //Constants
     public const float com_range = 10;         //Communication range
@@ -69,7 +70,7 @@ public class Node : MonoBehaviour
             });
             //RollCall();
             SendRP();
-            TaskAssignment();
+            _TaskAssignment.AssignTasks(this, Unreached_Targets, _swarm.GetMembers());
         }
     }
 
@@ -82,7 +83,7 @@ public class Node : MonoBehaviour
         Hops = FindHopsToLeader();
 
         //Target assignment
-        TaskAssignment();
+        _TaskAssignment.AssignTasks(this, Unreached_Targets, _swarm.GetMembers());
 
         if (Target != null)
             Move(Target.position);
@@ -313,80 +314,7 @@ public class Node : MonoBehaviour
         }
     }
 
-    private void TaskAssignment()
-    {
-        List<Transform> targets_to_assign = new List<Transform>();
-        targets_to_assign.AddRange(Unreached_Targets);
-        if (Unreached_Targets.Count < _swarm.GetMembers().Count)
-        {
-            targets_to_assign.AddRange(Pursuing_Targets);
-        }
-        
-        foreach (Transform un_target in targets_to_assign)
-        {
-            // Auction task
-            if (un_target != null)
-                AuctionTask(un_target);
-        }
-    }
-
-    private void AuctionTask(Transform target)
-    {
-        // Auction task
-        // Reset Bids
-        Bids = new Dictionary<int, float>();
-        // Send auction message to neighbours
-        foreach (Node node in _swarm.GetMembers())
-        {
-            //Change this later to send messages instead of changing variables
-            SendMsg(MsgTypes.AnounceAuctionMsg, node.ID, JsonConvert.SerializeObject(target.name, Formatting.None,
-                        new JsonSerializerSettings()
-                        { 
-                            ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-                        }));
-        }
-
-        //Wait for bit
-
-        ConcludeAuction(target);
-    }
-
-    private void ConcludeAuction(Transform target)
-    {
-        if (Bids.Count == 0)
-        {
-            //Debug.Log("No bids recieved");
-            return;
-        }
-
-        float min_bid = float.MaxValue;
-        int min_bid_id = 0;
-        foreach (KeyValuePair<int, float> bit in Bids)
-        {
-            //Debug.Log("Bid: " + bit.Value + " from: " + bit.Key);
-            if (bit.Value < min_bid)
-            {
-                min_bid = bit.Value;
-                min_bid_id = bit.Key;
-            }
-        }
-
-        //Debug.Log("Min bid: " + min_bid + " from: " + min_bid_id);
-        Unreached_Targets.Remove(target);
-        Pursuing_Targets.Add(target);
-
-        // Send task to winner
-        foreach (Node node in _swarm.GetMembers())
-        {
-            //Change this later to send messages instead of changing variables
-            if (node.ID == min_bid_id)
-                SendMsg(MsgTypes.SetTargetMsg, node.ID, JsonConvert.SerializeObject(target.name, Formatting.None,
-                        new JsonSerializerSettings()
-                        { 
-                            ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-                        }));
-        }
-    }
+    
 
     public void SetTarget(Transform target, int node_id)
     {
@@ -403,7 +331,7 @@ public class Node : MonoBehaviour
         Target = target;
     }
 
-    public void SendMsg(Nodes.MsgTypes msg_type, int recv_id, string value)
+    public void SendMsg(MsgTypes msg_type, int recv_id, string value)
     {
         foreach (Node node in _swarm.GetMembers())
         {
@@ -417,7 +345,7 @@ public class Node : MonoBehaviour
         Debug.Log("No reciever mached id: " + recv_id);
     }
 
-    public void ReceiveMsg(Nodes.MsgTypes msg_type, int sender_id, string value)
+    public void ReceiveMsg(MsgTypes msg_type, int sender_id, string value)
     {
         // Handle unreliable communication
         // Recieve msg
@@ -433,7 +361,7 @@ public class Node : MonoBehaviour
                     Transform target_reached = GameObject.Find(JsonConvert.DeserializeObject<string>(value)).transform;
                     Pursuing_Targets.Remove(target_reached);
                     target_reached.gameObject.GetComponent<Target>().TargetReachedByNode();
-                    TaskAssignment();
+                    _TaskAssignment.AssignTasks(this, Unreached_Targets, _swarm.GetMembers());
                 }
                 break;
             case MsgTypes.SetRPMsg:
@@ -448,39 +376,16 @@ public class Node : MonoBehaviour
                 //To do
                 break;
             case MsgTypes.AnounceAuctionMsg:
-                HandleAnounceAuctionMsg(sender_id, value);
+                _TaskAssignment.HandleAnounceAuctionMsg(this,sender_id, value);
                 break;
             case MsgTypes.ReturnBitMsg:
                 //Debug.Log("Recieved bit from: " + sender_id + " with value: " + value);
-                Bids.Add(sender_id,JsonConvert.DeserializeObject<float>(value));
+                _TaskAssignment.AddBid(sender_id,JsonConvert.DeserializeObject<float>(value));
                 break;
         }
     }
 
-    private void HandleAnounceAuctionMsg(int sender_id, string value)
-    {
-        //Debug.Log("Recieved auction message from: " + sender_id + " with value: " + value);
-        Transform target_to_auction = GameObject.Find(JsonConvert.DeserializeObject<string>(value)).transform;
-        //Find distance to target
-        float distance = Vector2.Distance(transform.position, target_to_auction.position);
-        if (Target != null)
-        {
-            return;
-            /*float distance_to_current_target = Vector2.Distance(transform.position, Target.position);
-            if (distance > distance_to_current_target)
-            {
-                //Debug.Log("Distance to target is greater than current target");
-                return;
-            }*/
-        }
-        
-        //Send distance to sender
-        SendMsg(MsgTypes.ReturnBitMsg, sender_id, JsonConvert.SerializeObject(distance, Formatting.None,
-                new JsonSerializerSettings()
-                { 
-                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-                }));
-    }
+    
 
     private void RollCallRecvHandler(int sender_id, int id_to_check)
     {

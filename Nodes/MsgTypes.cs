@@ -1,5 +1,4 @@
-namespace Nodes
-{
+// Description: Enum for message types
     public enum MsgTypes
     {
         SetTargetMsg,
@@ -10,4 +9,3 @@ namespace Nodes
         AnounceAuctionMsg,
         ReturnBitMsg
     }
-}
