@@ -31,12 +31,6 @@ public class TaskAssignmnet
         if (RecieverNode.Target != null)
         {
             return;
-            /*float distance_to_current_target = Vector2.Distance(transform.position, Target.position);
-            if (distance > distance_to_current_target)
-            {
-                //Debug.Log("Distance to target is greater than current target");
-                return;
-            }*/
         }
         
         //Send distance to sender
@@ -69,21 +63,17 @@ public class TaskAssignmnet
     private void AuctionTask(Node Auctioneer, Transform target, List<Node> Nodes_to_assign)
     {
         // Auction task
-        // Reset Bids
-        Bids = new Dictionary<int, float>();
+        Bids = new Dictionary<int, float>(); //Reset bids
         // Send auction message to neighbours
         foreach (Node node in Nodes_to_assign)
         {
-            //Change this later to send messages instead of changing variables
             _com.SendMsg(Auctioneer, MsgTypes.AnounceAuctionMsg, node.ID, JsonConvert.SerializeObject(target.name, Formatting.None,
                         new JsonSerializerSettings()
                         { 
                             ReferenceLoopHandling = ReferenceLoopHandling.Ignore
                         }));
         }
-
-        //Wait for bit
-
+        
         ConcludeAuction(Auctioneer,target,Nodes_to_assign);
     }
 

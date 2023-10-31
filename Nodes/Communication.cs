@@ -25,11 +25,7 @@ public class Communication : MonoBehaviour
             ConnectedToLeader = true;
         }
     }
-    void Start()
-    {
-    }
 
-    // Update is called once per frame
     void Update()
     {
         FindConnectingNeighbor();
@@ -43,12 +39,9 @@ public class Communication : MonoBehaviour
         NB = new List<GameObject>(); //Clear neighbour list
         foreach (GameObject node in nodes)
         {
-            if (node.name != name)
+            if (node.name != name && (Vector2.Distance(node.transform.position, transform.position) < com_range))
             {
-                if (Vector2.Distance(node.transform.position, transform.position) < com_range)
-                {
-                    NB.Add(node); //Add node to neighbour list
-                }
+                NB.Add(node); //Add node to neighbour list
             }
         }
     }
@@ -58,32 +51,28 @@ public class Communication : MonoBehaviour
         //Find min hop count to leader among neighbors
         if (GetComponent<Node>().GetInstanceID() == _swarm.Leader.GetInstanceID())
             return Hops = 0;
-        else
+        
+        int min_hop = int.MaxValue;
+        foreach (GameObject node in NB)
         {
-            int min_hop = int.MaxValue;
-            foreach (GameObject node in NB)
+            if (node.GetComponent<Communication>().Hops < min_hop)
             {
-                if (node.GetComponent<Communication>().Hops < min_hop)
-                {
-                    min_hop = node.GetComponent<Communication>().Hops;
-                }
-            }
-
-            if (min_hop >= NSN)
-            {
-                //Debug.Log("No connection to leader");
-                ConnectedToLeader = false;
-                _swarm.RemoveMember(GetComponent<Node>());
-                min_hop = int.MaxValue;
-                return Hops = min_hop;
-            }
-            else
-            {
-                ConnectedToLeader = true;
-                _swarm.AddMember(GetComponent<Node>());
-                return Hops = min_hop + 1;
+                min_hop = node.GetComponent<Communication>().Hops;
             }
         }
+
+        if (min_hop >= NSN)
+        {
+            //Debug.Log("No connection to leader");
+            ConnectedToLeader = false;
+            _swarm.RemoveMember(GetComponent<Node>());
+            min_hop = int.MaxValue;
+            return Hops = min_hop;
+        }
+        
+        ConnectedToLeader = true;
+        _swarm.AddMember(GetComponent<Node>());
+        return Hops = min_hop + 1;
     }
 
     private Node FindConnectingNeighbor()

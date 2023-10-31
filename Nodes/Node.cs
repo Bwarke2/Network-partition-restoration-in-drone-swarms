@@ -21,7 +21,6 @@ public class Node : MonoBehaviour
     private Swarm _swarm;    //Swarm object
 
     //Leader attributes
-    //public List<Node> Members = new List<Node>(); //Number of connected nodes
     public List<Transform> Unreached_Targets = new List<Transform>();         //Number of unreached targets
     private TaskAssignmnet _TaskAssignment = new TaskAssignmnet();
 
@@ -39,8 +38,6 @@ public class Node : MonoBehaviour
         _swarm = GameObject.FindGameObjectWithTag("Swarm").GetComponent<Swarm>();
         _com = GetComponent<Communication>();
         _TaskAssignment.Setup(_com);
-        //foreach (GameObject go in GameObject.FindGameObjectsWithTag("Node"))
-            //Members.Add(go.GetComponent<Node>());
     }
 
     void Start()
@@ -56,7 +53,7 @@ public class Node : MonoBehaviour
             foreach (GameObject go in GameObject.FindGameObjectsWithTag("Target"))
                 Unreached_Targets.Add(go.transform);
 
-            //Sort targets pased on distance
+            //Sort targets based on distance to node start position
             Unreached_Targets.Sort(delegate (Transform a, Transform b)
             {
                 return Vector2.Distance(a.position, transform.position).CompareTo(Vector2.Distance(b.position, transform.position));
@@ -67,8 +64,6 @@ public class Node : MonoBehaviour
             _TaskAssignment.AssignTasks(this, Unreached_Targets, _swarm.GetMembers());
         }
     }
-
-    
 
     // Update is called once per frame
     void Update()
@@ -91,44 +86,6 @@ public class Node : MonoBehaviour
         }
     }
 
-    
-
-    
-
-    /*
-    private void RollCall() //Old
-    {
-        // Make list of temp members
-        List<Node> temp_members = new List<Node>();
-        foreach (Node node in temp_members)
-        {
-            Members.Remove(node);
-            if (node.RollCallID(node.ID))
-            {
-                Members.Add(node);
-            }
-        }
-    }
-
-    public bool RollCallID(int id) //Old
-    {
-        if (ID == id)
-            return true;
-        else
-            return false;
-        /* Change this to propagate through the system
-        else
-        {
-            // Prevent looping 
-
-            foreach (Gameobject node in NB)
-                if (node.SendMessage("RollCallID",id))
-                    return true;
-        }
-        
-    }
-    */
-    // actions
     public void Move(Vector2 target)
     {
         //Move to target
@@ -187,7 +144,6 @@ public class Node : MonoBehaviour
     public void StartElection()
     {
         //Start election
-
         Term = Term + 1;
         //Broadcast result
         Broadcast_Winner(Term);
@@ -237,8 +193,6 @@ public class Node : MonoBehaviour
             //Debug.Log("Node " + ID + " broadcasting winner: " + L_id + " with term: " + Term);
         }
     }
-
-    
 
     public void SetTarget(Transform target, int node_id)
     {
@@ -292,8 +246,4 @@ public class Node : MonoBehaviour
     {
         _TaskAssignment.AddBid(sender_id, JsonConvert.DeserializeObject<float>(value));
     }
-
-
-
-
 }
