@@ -10,6 +10,12 @@ public class TaskAssignmnet
     public List<Transform> Unreached_Targets = new List<Transform>();
     public List<Transform> Pursuing_Targets = new List<Transform>();
     public Dictionary<int, float> Bids = new Dictionary<int, float>();
+    private Communication _com = null;
+
+    public void Setup(Communication com)
+    {
+        _com = com;
+    }
 
     public void AddBid(int bidder_id, float bid)
     {
@@ -34,7 +40,7 @@ public class TaskAssignmnet
         }
         
         //Send distance to sender
-        RecieverNode.SendMsg(MsgTypes.ReturnBitMsg, sender_id, JsonConvert.SerializeObject(distance, Formatting.None,
+        _com.SendMsg(RecieverNode, MsgTypes.ReturnBitMsg, sender_id, JsonConvert.SerializeObject(distance, Formatting.None,
                 new JsonSerializerSettings()
                 { 
                     ReferenceLoopHandling = ReferenceLoopHandling.Ignore
@@ -69,7 +75,7 @@ public class TaskAssignmnet
         foreach (Node node in Nodes_to_assign)
         {
             //Change this later to send messages instead of changing variables
-            Auctioneer.SendMsg(MsgTypes.AnounceAuctionMsg, node.ID, JsonConvert.SerializeObject(target.name, Formatting.None,
+            _com.SendMsg(Auctioneer, MsgTypes.AnounceAuctionMsg, node.ID, JsonConvert.SerializeObject(target.name, Formatting.None,
                         new JsonSerializerSettings()
                         { 
                             ReferenceLoopHandling = ReferenceLoopHandling.Ignore
@@ -110,7 +116,7 @@ public class TaskAssignmnet
         {
             //Change this later to send messages instead of changing variables
             if (node.ID == min_bid_id)
-                Auctioneer.SendMsg(MsgTypes.SetTargetMsg, node.ID, JsonConvert.SerializeObject(target.name, Formatting.None,
+                _com.SendMsg(Auctioneer, MsgTypes.SetTargetMsg, node.ID, JsonConvert.SerializeObject(target.name, Formatting.None,
                         new JsonSerializerSettings()
                         { 
                             ReferenceLoopHandling = ReferenceLoopHandling.Ignore

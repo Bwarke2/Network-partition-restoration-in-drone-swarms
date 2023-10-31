@@ -335,6 +335,7 @@ GameObject:
   - component: {fileID: 150267357}
   - component: {fileID: 150267356}
   - component: {fileID: 150267358}
+  - component: {fileID: 150267359}
   m_Layer: 6
   m_Name: Follower (4)
   m_TagString: Node
@@ -376,12 +377,7 @@ MonoBehaviour:
   Target: {fileID: 0}
   RP: {x: 0, y: 0}
   Bat: 100
-  NSN: 0
-  NB: []
-  Hops: 2147483647
-  ConnectedToLeader: 0
   Unreached_Targets: []
-  Pursuing_Targets: []
 --- !u!212 &150267355
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -531,6 +527,22 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 10
+--- !u!114 &150267359
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 150267351}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4253e15f8e46ae4290b42d4a0300d81, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  NB: []
+  Hops: 2147483647
+  ConnectedToLeader: 0
+  NSN: 0
 --- !u!1 &176565589
 GameObject:
   m_ObjectHideFlags: 0
@@ -1431,6 +1443,7 @@ GameObject:
   - component: {fileID: 563051240}
   - component: {fileID: 563051239}
   - component: {fileID: 563051241}
+  - component: {fileID: 563051242}
   m_Layer: 6
   m_Name: Follower (2)
   m_TagString: Node
@@ -1472,12 +1485,7 @@ MonoBehaviour:
   Target: {fileID: 0}
   RP: {x: 0, y: 0}
   Bat: 100
-  NSN: 0
-  NB: []
-  Hops: 2147483647
-  ConnectedToLeader: 0
   Unreached_Targets: []
-  Pursuing_Targets: []
 --- !u!212 &563051238
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -1627,6 +1635,22 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 10
+--- !u!114 &563051242
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 563051234}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4253e15f8e46ae4290b42d4a0300d81, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  NB: []
+  Hops: 2147483647
+  ConnectedToLeader: 0
+  NSN: 0
 --- !u!1 &592931638
 GameObject:
   m_ObjectHideFlags: 0
@@ -1844,6 +1868,7 @@ GameObject:
   - component: {fileID: 667200005}
   - component: {fileID: 667200004}
   - component: {fileID: 667200006}
+  - component: {fileID: 667200007}
   m_Layer: 6
   m_Name: Node_leader
   m_TagString: Node
@@ -1869,12 +1894,7 @@ MonoBehaviour:
   Target: {fileID: 0}
   RP: {x: 0, y: 0}
   Bat: 100
-  NSN: 0
-  NB: []
-  Hops: 2147483647
-  ConnectedToLeader: 0
   Unreached_Targets: []
-  Pursuing_Targets: []
 --- !u!212 &667200002
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -2040,6 +2060,22 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 10
+--- !u!114 &667200007
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 667200000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4253e15f8e46ae4290b42d4a0300d81, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  NB: []
+  Hops: 2147483647
+  ConnectedToLeader: 0
+  NSN: 0
 --- !u!1 &737948589
 GameObject:
   m_ObjectHideFlags: 0
@@ -2339,6 +2375,7 @@ GameObject:
   - component: {fileID: 908969920}
   - component: {fileID: 908969919}
   - component: {fileID: 908969921}
+  - component: {fileID: 908969922}
   m_Layer: 6
   m_Name: Follower
   m_TagString: Node
@@ -2380,12 +2417,7 @@ MonoBehaviour:
   Target: {fileID: 0}
   RP: {x: 0, y: 0}
   Bat: 100
-  NSN: 0
-  NB: []
-  Hops: 2147483647
-  ConnectedToLeader: 0
   Unreached_Targets: []
-  Pursuing_Targets: []
 --- !u!212 &908969918
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -2535,6 +2567,22 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 10
+--- !u!114 &908969922
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 908969914}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4253e15f8e46ae4290b42d4a0300d81, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  NB: []
+  Hops: 2147483647
+  ConnectedToLeader: 0
+  NSN: 0
 --- !u!1 &921640629
 GameObject:
   m_ObjectHideFlags: 0
@@ -2899,6 +2947,7 @@ GameObject:
   - component: {fileID: 1080474548}
   - component: {fileID: 1080474547}
   - component: {fileID: 1080474549}
+  - component: {fileID: 1080474550}
   m_Layer: 6
   m_Name: Follower (1)
   m_TagString: Node
@@ -2940,12 +2989,7 @@ MonoBehaviour:
   Target: {fileID: 0}
   RP: {x: 0, y: 0}
   Bat: 100
-  NSN: 0
-  NB: []
-  Hops: 2147483647
-  ConnectedToLeader: 0
   Unreached_Targets: []
-  Pursuing_Targets: []
 --- !u!212 &1080474546
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -3095,6 +3139,22 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 10
+--- !u!114 &1080474550
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1080474542}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4253e15f8e46ae4290b42d4a0300d81, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  NB: []
+  Hops: 2147483647
+  ConnectedToLeader: 0
+  NSN: 0
 --- !u!1 &1155983114
 GameObject:
   m_ObjectHideFlags: 0
@@ -3900,6 +3960,7 @@ GameObject:
   - component: {fileID: 1570264538}
   - component: {fileID: 1570264537}
   - component: {fileID: 1570264539}
+  - component: {fileID: 1570264540}
   m_Layer: 6
   m_Name: Follower (3)
   m_TagString: Node
@@ -3941,12 +4002,7 @@ MonoBehaviour:
   Target: {fileID: 0}
   RP: {x: 0, y: 0}
   Bat: 100
-  NSN: 0
-  NB: []
-  Hops: 2147483647
-  ConnectedToLeader: 0
   Unreached_Targets: []
-  Pursuing_Targets: []
 --- !u!212 &1570264536
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -4096,6 +4152,22 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 10
+--- !u!114 &1570264540
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1570264532}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4253e15f8e46ae4290b42d4a0300d81, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  NB: []
+  Hops: 2147483647
+  ConnectedToLeader: 0
+  NSN: 0
 --- !u!1 &1578894773
 GameObject:
   m_ObjectHideFlags: 0
