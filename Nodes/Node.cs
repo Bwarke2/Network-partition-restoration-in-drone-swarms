@@ -14,6 +14,8 @@ public class Node : MonoBehaviour
     public Vector2 RP;       //Rendezvous Point
     public float Bat = 100;         //Battery
     
+    //Movement strategy
+    private IMovementStrategy _moveStrat = new NoTargetStrategy();
     
     //Communication attributes
     private Communication _com;
@@ -27,7 +29,7 @@ public class Node : MonoBehaviour
 
     //Constants
     public const float com_range = 10;         //Communication range
-    public const float speed = 1; //Movement speed
+    
 
     // Start is called before the first frame update
     void Awake()
@@ -73,53 +75,54 @@ public class Node : MonoBehaviour
         _com.UpdateNeighbours();
         //Target assignment
         _TaskAssignment.AssignTasks(this, Unreached_Targets, _swarm.GetMembers());
-
-        if (Target != null)
-            Move(Target.position);
-        else if (_com.ConnectedToLeader)
-        {
-            //Move toward leader's position
-            Move(_swarm.Leader.transform.position);
-        }
-        else
-        {
-            //Move toward RP
-            Move(RP);
-        }
     }
 
-    public void Move(Vector2 target)
+    void LateUpdate()
     {
-        //Move to target
-        float step = speed * Time.deltaTime;
-        Vector2 desired_pos;
+        DecideMoveStrat();
+        _moveStrat.Move(this);
+    }
+
+    public void DecideMoveStrat()
+    {
+        if (Target == null)
+        {
+            _moveStrat = new NoTargetStrategy();
+            return;
+        }
+
         if (FindFobj() < 1)
         {
             //Debug.Log("To far from Leader connection");
-            desired_pos = _com.GetConnectingNeighbor().transform.position;
+            _moveStrat = new TooFarStrategy();
+            _moveStrat.SetConnectingNode(_com.GetConnectingNeighbor());
+            return;
         }
-        else
-            desired_pos = target;
-        // Check if inside safe distance
-        bool inside_safe_distance = false;
+        //Check if too close to neighbour
+        float dist_to_closest_nb = Mathf.Infinity;
         foreach (GameObject node in _com.GetNeighbours())
         {
-            if (Vector2.Distance(node.transform.position, transform.position) < Safe)
+            float dist = Vector2.Distance(node.transform.position, transform.position);
+            if (dist < dist_to_closest_nb)
+                dist_to_closest_nb = dist;
+            if (dist < Safe)
             {
                 //Move away from node
-                Vector3 dir = transform.position - node.transform.position;
-                dir = dir.normalized;
-                desired_pos = transform.position + dir;
-                inside_safe_distance = true;
+                _moveStrat = new TooCloseStrategy();
+                List<Node> neighbours = new List<Node>();
+                foreach (GameObject go in _com.GetNeighbours())
+                {
+                    neighbours.Add(go.GetComponent<Node>());
+                }
+                _moveStrat.SetNeighbors(neighbours);
+                return;
             }
         }
-        transform.position = Vector2.MoveTowards(transform.position, desired_pos, step);
-        
-        if (Target != null)
-            TargetReached();
+        if (dist_to_closest_nb > Safe + 0.5)
+            _moveStrat = new TargetStrategy();
     }
 
-    private float FindFobj() //Basic version
+    public float FindFobj() //Basic version
     {
         return (com_range - DistanceToConnectingNeighbor());
     }
@@ -141,6 +144,11 @@ public class Node : MonoBehaviour
             return true;
         }
         return false;
+    }
+
+    private void SetMoveStrat(IMovementStrategy moveStrat)
+    {
+        _moveStrat = moveStrat;
     }
 
     public void SendRP()
