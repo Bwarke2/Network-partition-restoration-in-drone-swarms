@@ -15,7 +15,7 @@ public class Node : MonoBehaviour
     public float Bat = 100;         //Battery
     
     //Movement strategy
-    private IMovementStrategy _moveStrat = new NoTargetStrategy();
+    private Movement _movement = null;
     
     //Communication attributes
     private Communication _com;
@@ -42,6 +42,7 @@ public class Node : MonoBehaviour
         _com = GetComponent<Communication>();
         _TaskAssignment.Setup(_com);
         _leaderElection.Startup(_com);
+        _movement = new Movement(_swarm,_com, new NoTargetStrategy());
     }
 
     void Start()
@@ -80,46 +81,29 @@ public class Node : MonoBehaviour
     void LateUpdate()
     {
         DecideMoveStrat();
-        _moveStrat.Move(this);
+        _movement.Move(this);
     }
 
     public void DecideMoveStrat()
     {
-        if (_com.ConnectedToLeader == false)
-        {
-            switch (_swarm.PartitionPolicy)
-            {
-                case PartitionPolicy.PRP1:
-                    _moveStrat = new LostNodePRP1();
-                    break;
-                case PartitionPolicy.PRP2:
-                    _moveStrat = new LostNodePRP2();
-                    break;
-                case PartitionPolicy.PRP3:  
-                    _moveStrat = new LostNodePRP3();
-                    break;
-            }
-                
-            return;
-        }
-
         if (_swarm.GetMembers().Count < _com.GetNSN())
         {
-            _moveStrat = new SwarmPRP();
+            _movement.LostNodeEvent(this);
             return;
         }
+        _movement.PartitionRestoredEvent(this);
 
         if (Target == null)
         {
-            _moveStrat = new NoTargetStrategy();
             return;
         }
-        if (FindFobj() < 1)
+
+        float F_obj = FindFobj();
+        if (F_obj < 1)
         {
             if (debug_node)
                 Debug.Log("To far from Leader connection");
-            _moveStrat = new TooFarStrategy();
-            _moveStrat.SetConnectingNode(_com.GetConnectingNeighbor());
+            _movement.TooFarEvent(this, _com.GetConnectingNeighbor());
             return;
         }
         //Check if too close to neighbour
@@ -132,18 +116,18 @@ public class Node : MonoBehaviour
             if (dist < Safe)
             {
                 //Move away from node
-                _moveStrat = new TooCloseStrategy();
                 List<Node> neighbours = new List<Node>();
                 foreach (GameObject go in _com.GetNeighbours())
                 {
                     neighbours.Add(go.GetComponent<Node>());
                 }
-                _moveStrat.SetNeighbors(neighbours);
+                _movement.TooCloseEvent(this, neighbours);
                 return;
             }
         }
-        if (dist_to_closest_nb > Safe + 0.5)
-            _moveStrat = new TargetStrategy();
+        /*
+        if (dist_to_closest_nb > Safe + 0.5 && F_obj > 1.1)
+            _movement.NormalRangeEvent(this);*/
     }
 
     public float FindFobj() //Basic version
@@ -174,15 +158,11 @@ public class Node : MonoBehaviour
         {
             string value = JsonConvert.SerializeObject(Target.gameObject.name);
             Target = null;
+            _movement.TargetReachedEvent(this);
             _com.SendMsg(this, MsgTypes.TargetReachedMsg, _leaderElection.GetLeaderID(), value);
             return true;
         }
         return false;
-    }
-
-    private void SetMoveStrat(IMovementStrategy moveStrat)
-    {
-        _moveStrat = moveStrat;
     }
 
     public void SendRP()
@@ -219,6 +199,7 @@ public class Node : MonoBehaviour
     public void SetOwnTarget(Transform target)
     {
         Target = target;
+        _movement.NewTargetEvent(this);
     }
 
     public void SetTargetMsgHandler(int sender_id, string value)

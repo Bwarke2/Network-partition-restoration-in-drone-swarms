@@ -4,6 +4,29 @@ using UnityEngine;
 
 public class TargetStrategy : IMovementStrategy
 {
+    private Movement _movement;
+    public void SetMovement(Movement movement)
+    {
+        _movement = movement;
+    }
+    public void HandleTargetReached(Node node)
+    {
+        _movement.SetStrategy(new NoTargetStrategy());
+    }
+
+    public void HandleTooClose(Node node, List<Node> neighbors)
+    {
+        _movement.SetStrategy(new TooCloseStrategy());
+        
+        _movement.GetStrategy().SetNeighbors(neighbors);
+    }
+
+    public void HandleTooFar(Node node, Node connectingNode)
+    {
+        _movement.SetStrategy(new TooFarStrategy());
+        _movement.GetStrategy().SetConnectingNode(connectingNode);
+    }
+
     public void Move(Node node)
     {
         //Debug.Log("Moving towards target");

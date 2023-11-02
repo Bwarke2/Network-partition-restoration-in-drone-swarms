@@ -4,6 +4,12 @@ using UnityEngine;
 
 public class TooCloseStrategy : IMovementStrategy
 {
+    private float _safeMargin = 2;
+    private Movement _movement;
+    public void SetMovement(Movement movement)
+    {
+        _movement = movement;
+    }
     protected List<Node> Neighbors = new List<Node>();
     public void SetNeighbors(List<Node> neighbors)
     {
@@ -31,11 +37,31 @@ public class TooCloseStrategy : IMovementStrategy
             return;
         Node closest = GetClosestNeighbor(node);
 
+        float dist = Vector3.Distance(node.transform.position, closest.transform.position);
+        if (dist > _safeMargin)
+        {
+            _movement.NormalRangeEvent(node);
+        }
+
         //Get direction away from closest
         Vector3 dir = node.transform.position - closest.transform.position;
         //dir = dir.normalized;
         Vector3 desired_pos = node.transform.position + dir;
         float step = IMovementStrategy._speed * Time.deltaTime;
         node.transform.position = Vector2.MoveTowards(node.transform.position, desired_pos, step);
+    }
+
+    public void HandleNormalRange(Node node)
+    {
+        if (node.Target == null)
+        {
+            _movement.SetStrategy(new NoTargetStrategy());
+            return;
+        }
+        else
+        {
+            _movement.SetStrategy(new TargetStrategy());
+            return;
+        }
     }
 }

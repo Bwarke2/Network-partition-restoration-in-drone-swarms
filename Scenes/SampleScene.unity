@@ -5087,7 +5087,7 @@ MonoBehaviour:
   LostNodes: []
   RemainingTargets: []
   Leader: {fileID: 0}
-  partitionPolicy: 0
+  PartitionPolicy: 1
 --- !u!114 &2130058924
 MonoBehaviour:
   m_ObjectHideFlags: 0
