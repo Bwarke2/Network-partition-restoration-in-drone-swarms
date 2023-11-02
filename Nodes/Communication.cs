@@ -7,7 +7,7 @@ public class Communication : MonoBehaviour
     public List<GameObject> NB = new List<GameObject>();    //Neighbouring nodes
     public int Hops = int.MaxValue;        //Number of hops to leader
     public bool ConnectedToLeader = false; //Connected to leader
-    private Node ConnnectingNeighbor;       //Connecting neighbour
+    public Node ConnnectingNeighbor;       //Connecting neighbour
     private int NSN;             // Node start number
 
     private Swarm _swarm;
@@ -81,9 +81,14 @@ public class Communication : MonoBehaviour
         int min_hop = int.MaxValue;
         foreach (GameObject node in NB)
         {
-            if (node.GetComponent<Communication>().Hops <= min_hop)
+            if (node.GetComponent<Communication>().Hops < min_hop)
             {
                 min_hop = node.GetComponent<Communication>().Hops;
+                min_distance = Vector2.Distance(node.transform.position, transform.position);
+                ConnnectingNeighbor = node.GetComponent<Node>();
+            }
+            if (node.GetComponent<Communication>().Hops == min_hop)
+            {
                 if (Vector2.Distance(node.transform.position, transform.position) < min_distance)
                 {
                     min_distance = Vector2.Distance(node.transform.position, transform.position);
@@ -141,6 +146,19 @@ public class Communication : MonoBehaviour
                 Recieving_node.BroadcastWinnerMsgHandler(sender_id, value);
                 break;
         }
+    }
+
+    public List<Node> GetPossibleConnections()
+    {
+        List<Node> possible_connections = new List<Node>();
+        foreach (GameObject node in NB)
+        {
+            if (node.GetComponent<Communication>().Hops <= Hops)
+            {
+                possible_connections.Add(node.GetComponent<Node>());
+            }
+        }
+        return possible_connections;
     }
 
     public Node GetConnectingNeighbor()

@@ -2,6 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum PartitionPolicy
+{
+    PRP1,
+    PRP2,
+    PRP3
+}
+
 public class Swarm : MonoBehaviour
 {
     // Start is called before the first frame update
@@ -12,6 +19,8 @@ public class Swarm : MonoBehaviour
     public List<GameObject> RemainingTargets = new List<GameObject>();
 
     public Node Leader;
+
+    public PartitionPolicy PartitionPolicy = PartitionPolicy.PRP1;
 
     void Awake()
     {

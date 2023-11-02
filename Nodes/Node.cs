@@ -30,7 +30,7 @@ public class Node : MonoBehaviour
     //Constants
     public const float com_range = 10;         //Communication range
     
-
+    public bool debug_node = false;
     // Start is called before the first frame update
     void Awake()
     {
@@ -49,7 +49,7 @@ public class Node : MonoBehaviour
         _com.UpdateNeighbours();
         if (name == "Node_leader")
         {
-            Debug.Log("Running leader code");
+            Debug.Log("Running leader setup code");
             _leaderElection.LeaderStart(ID);
             _leaderElection.StartElection(_swarm.GetMembers());
             _swarm.Leader = this;
@@ -85,15 +85,39 @@ public class Node : MonoBehaviour
 
     public void DecideMoveStrat()
     {
+        if (_com.ConnectedToLeader == false)
+        {
+            switch (_swarm.PartitionPolicy)
+            {
+                case PartitionPolicy.PRP1:
+                    _moveStrat = new LostNodePRP1();
+                    break;
+                case PartitionPolicy.PRP2:
+                    _moveStrat = new LostNodePRP2();
+                    break;
+                case PartitionPolicy.PRP3:  
+                    _moveStrat = new LostNodePRP3();
+                    break;
+            }
+                
+            return;
+        }
+
+        if (_swarm.GetMembers().Count < _com.GetNSN())
+        {
+            _moveStrat = new SwarmPRP();
+            return;
+        }
+
         if (Target == null)
         {
             _moveStrat = new NoTargetStrategy();
             return;
         }
-
         if (FindFobj() < 1)
         {
-            //Debug.Log("To far from Leader connection");
+            if (debug_node)
+                Debug.Log("To far from Leader connection");
             _moveStrat = new TooFarStrategy();
             _moveStrat.SetConnectingNode(_com.GetConnectingNeighbor());
             return;
@@ -124,13 +148,23 @@ public class Node : MonoBehaviour
 
     public float FindFobj() //Basic version
     {
-        return (com_range - DistanceToConnectingNeighbor());
+        if (ID == _leaderElection.GetLeaderID())
+            return 1;
+        return (com_range - DistanceToConnectedNeighbor());
     }
 
-    private float DistanceToConnectingNeighbor()
+    private float DistanceToConnectedNeighbor()
     {
-        //Find distance to connecting neighbour
-        return Vector2.Distance(_com.GetConnectingNeighbor().transform.position, transform.position);
+        float min_dist = Mathf.Infinity;
+        foreach (Node node in _com.GetPossibleConnections())
+        {
+            float dist = Vector2.Distance(node.transform.position, transform.position);
+            if (dist < min_dist)
+            {
+                min_dist = dist;
+            }
+        }
+        return min_dist;
     }
 
     public bool TargetReached()
@@ -227,7 +261,7 @@ public class Node : MonoBehaviour
 
     public void BroadcastWinnerMsgHandler(int sender_id, string value)
     {
-        Debug.Log("Recieved broadcast winner msg");
+        //Debug.Log("Recieved broadcast winner msg");
         _leaderElection.HandleBroadcastWinnerMsg(sender_id, value);
     }
 }

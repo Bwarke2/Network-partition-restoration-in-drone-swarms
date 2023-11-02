@@ -34,7 +34,7 @@ public class LeaderElection
     public void StartElection(List<Node> nodes_participating)
     {
         //Start election
-        Debug.Log("Starting election");
+        //Debug.Log("Starting election");
         int New_Term = Term + 1;
         //Broadcast result
         int winner = L_id;
@@ -55,7 +55,7 @@ public class LeaderElection
         }
         Term = new_term;
         L_id = winner_id;
-        Debug.Log("New leader is: " + L_id);
+        //Debug.Log("New leader is: " + L_id);
         //Broadcast winner to neighbours
         foreach (Node node in nodes_participating)
         {
@@ -73,6 +73,6 @@ public class LeaderElection
     public void HandleBroadcastWinnerMsg(int sender_id, string value)
     {
         L_id = JsonConvert.DeserializeObject<int>(value);
-        Debug.Log("New leader is: " + L_id);
+        //Debug.Log("New leader is: " + L_id);
     }
 }
