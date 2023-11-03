@@ -1060,7 +1060,6 @@ MonoBehaviour:
   ID: 0
   Position: {x: 0, y: 0}
   P_start: {x: 0, y: 0}
-  Target: {fileID: 0}
   RP: {x: 0, y: 0}
   Bat: 100
   Unreached_Targets: []
@@ -1568,7 +1567,6 @@ MonoBehaviour:
   ID: 0
   Position: {x: 0, y: 0}
   P_start: {x: 0, y: 0}
-  Target: {fileID: 0}
   RP: {x: 0, y: 0}
   Bat: 100
   Unreached_Targets: []
@@ -1894,7 +1892,6 @@ MonoBehaviour:
   ID: 0
   Position: {x: 0, y: 0}
   P_start: {x: 0, y: 0}
-  Target: {fileID: 0}
   RP: {x: 0, y: 0}
   Bat: 100
   Unreached_Targets: []
@@ -2246,7 +2243,6 @@ MonoBehaviour:
   ID: 0
   Position: {x: 0, y: 0}
   P_start: {x: 0, y: 0}
-  Target: {fileID: 0}
   RP: {x: 0, y: 0}
   Bat: 100
   Unreached_Targets: []
@@ -2641,7 +2637,6 @@ MonoBehaviour:
   ID: 0
   Position: {x: 0, y: 0}
   P_start: {x: 0, y: 0}
-  Target: {fileID: 0}
   RP: {x: 0, y: 0}
   Bat: 100
   Unreached_Targets: []
@@ -3214,7 +3209,6 @@ MonoBehaviour:
   ID: 0
   Position: {x: 0, y: 0}
   P_start: {x: 0, y: 0}
-  Target: {fileID: 0}
   RP: {x: 0, y: 0}
   Bat: 100
   Unreached_Targets: []
@@ -5087,7 +5081,7 @@ MonoBehaviour:
   LostNodes: []
   RemainingTargets: []
   Leader: {fileID: 0}
-  PartitionPolicy: 1
+  CurrentPartitionPolicy: 1
 --- !u!114 &2130058924
 MonoBehaviour:
   m_ObjectHideFlags: 0

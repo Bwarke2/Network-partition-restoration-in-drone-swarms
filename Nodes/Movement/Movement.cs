@@ -9,6 +9,7 @@ public class Movement
     private Swarm _swarm;
     private Communication _com;
     private Transform _target;
+    public Vector2 Last_Target_Pos;
     private Node _attached_node;
     public const float Safe = 1;   //Safe distance from other nodes
 
@@ -17,6 +18,7 @@ public class Movement
         _swarm = swarm;
         _com = com;
         _attached_node = node;
+        Last_Target_Pos = node.transform.position;
         SetStrategy(moveStrat);
     }
 
@@ -33,6 +35,8 @@ public class Movement
 
     public void SetTarget(Transform target)
     {
+        if (_target != null)
+            Last_Target_Pos = _target.position;
         _target = target;
     }
 

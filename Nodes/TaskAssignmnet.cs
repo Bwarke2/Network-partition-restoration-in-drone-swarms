@@ -17,6 +17,20 @@ public class TaskAssignmnet
     {
         _com = com;
         _movement = movement;
+
+        foreach (GameObject go in GameObject.FindGameObjectsWithTag("Target"))
+            Unreached_Targets.Add(go.transform);
+
+            //Sort targets based on distance to node start position
+        Unreached_Targets.Sort(delegate (Transform a, Transform b)
+        {
+            return Vector2.Distance(a.position, _com.transform.position).CompareTo(Vector2.Distance(b.position, _com.transform.position));
+        });
+    }
+
+    public bool RemovePursuingTarget(Transform target)
+    {
+        return Pursuing_Targets.Remove(target);
     }
 
     public void AddBid(int bidder_id, float bid)
@@ -32,6 +46,7 @@ public class TaskAssignmnet
         float distance = Vector2.Distance(RecieverNode.transform.position, target_to_auction.position);
         if (_movement.GetTarget() != null)
         {
+            //Debug.Log("Node: " + RecieverNode.name + " is already pursuing a target");
             return;
         }
         
@@ -43,22 +58,23 @@ public class TaskAssignmnet
                 }));
     }
 
-    public void AssignTasks(Node Auctioneer, List<Transform> Targets_to_assign, List<Node> Nodes_to_assign)
+    public void AssignTasks(Node Auctioneer, List<Node> Nodes_to_assign)
     {
-        //Debug.Log("Assigning tasks");
+        Debug.Log("Node: " + Auctioneer.name + " is auctioning tasks");
         List<Transform> inputTargets = new List<Transform>();
-        inputTargets.AddRange(Targets_to_assign);
+        inputTargets.AddRange(Unreached_Targets);
         if (Unreached_Targets.Count < Nodes_to_assign.Count)
         {
             inputTargets.AddRange(Pursuing_Targets);
         }
-        
+
         foreach (Transform un_target in inputTargets)
         {
-            //Debug.Log("Auctioning task");
             // Auction task
             if (un_target != null)
                 AuctionTask(Auctioneer, un_target, Nodes_to_assign);
+            else
+                Debug.Log("Target is null");
         }
     }
 
@@ -100,8 +116,9 @@ public class TaskAssignmnet
         }
 
         //Debug.Log("Min bid: " + min_bid + " from: " + min_bid_id);
-        Unreached_Targets.Remove(target);
+        
         Pursuing_Targets.Add(target);
+        Unreached_Targets.Remove(target);
 
         // Send task to winner
         foreach (Node node in Nodes_to_assign)
@@ -114,6 +131,8 @@ public class TaskAssignmnet
                             ReferenceLoopHandling = ReferenceLoopHandling.Ignore
                         }));
         }
+
+        
     }
 }
 

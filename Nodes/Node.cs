@@ -21,7 +21,7 @@ public class Node : MonoBehaviour
     private Swarm _swarm;    //Swarm object
 
     //Leader attributes
-    public List<Transform> Unreached_Targets = new List<Transform>();         //Number of unreached targets
+    //public List<Transform> Unreached_Targets = new List<Transform>();         //Number of unreached targets
     private TaskAssignmnet _TaskAssignment = new TaskAssignmnet();
 
     private LeaderElection _leaderElection = new LeaderElection();
@@ -54,18 +54,10 @@ public class Node : MonoBehaviour
             _leaderElection.StartElection(_swarm.GetMembers());
             _swarm.Leader = this;
             _com.FindHopsToLeader();
-            foreach (GameObject go in GameObject.FindGameObjectsWithTag("Target"))
-                Unreached_Targets.Add(go.transform);
-
-            //Sort targets based on distance to node start position
-            Unreached_Targets.Sort(delegate (Transform a, Transform b)
-            {
-                return Vector2.Distance(a.position, transform.position).CompareTo(Vector2.Distance(b.position, transform.position));
-            });
-            //RollCall();
             
-            SendRP();
-            _TaskAssignment.AssignTasks(this, Unreached_Targets, _swarm.GetMembers());
+            SendNewRP();
+            StartCoroutine(UpdateRP());
+            _TaskAssignment.AssignTasks(this, _swarm.GetMembers());
         }
     }
 
@@ -74,13 +66,41 @@ public class Node : MonoBehaviour
     {
         _com.UpdateNeighbours();
         //Target assignment
-        _TaskAssignment.AssignTasks(this, Unreached_Targets, _swarm.GetMembers());
+        //_TaskAssignment.AssignTasks(this, Unreached_Targets, _swarm.GetMembers());
     }
 
     void LateUpdate()
     {
         _movement.DecideMoveStrat(this);
         _movement.Move(this);
+    }
+
+    private IEnumerator UpdateRP()
+    {
+        while (true)
+        {
+            SendNewRP();
+            //Debug.Log("RP updated");
+            yield return new WaitForSeconds(1);
+        }
+    }
+
+    private IEnumerator RollCall()
+    {
+        //Debug.Log("Roll call started");
+        yield return new WaitForSeconds(1);
+        foreach (Node node in _swarm.GetMembers())
+        {
+            if (node.ID != ID)
+            {
+                //Debug.Log("Sending roll call to: " + node.ID);
+                _com.SendMsg(this, MsgTypes.RollCallMsg, node.ID, JsonConvert.SerializeObject(ID, Formatting.None,
+                        new JsonSerializerSettings()
+                        { 
+                            ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                        }));
+            }
+        }
     }
 
     public int GetLeaderID()
@@ -109,13 +129,14 @@ public class Node : MonoBehaviour
         return min_dist;
     }
 
-    public void SendRP()
+    public void SendNewRP()
     {
         // Add code to only allow setting when all nodes i connected
         if (_swarm.GetMembers().Count + 1 < _com.GetNSN())
         {
             return;
         }
+        ChooseRP();
         //Send RP to neighbours
         foreach (Node node in _swarm.GetMembers())
         {
@@ -125,6 +146,23 @@ public class Node : MonoBehaviour
                         { 
                             ReferenceLoopHandling = ReferenceLoopHandling.Ignore
                         }));
+        }
+    }
+
+    private void ChooseRP()
+    {
+        //Choose RP
+        switch (_swarm.CurrentPartitionPolicy)
+        {
+            case PartitionPolicy.PRP1:
+                RP = _movement.Last_Target_Pos;
+                break;
+            case PartitionPolicy.PRP2:
+                RP = _movement.Last_Target_Pos;
+                break;
+            case PartitionPolicy.PRP3:
+                RP = _movement.GetTarget().position;
+                break;
         }
     }
     public void SetTarget(Transform target, int node_id)
@@ -156,7 +194,7 @@ public class Node : MonoBehaviour
             Transform target_reached = GameObject.Find(JsonConvert.DeserializeObject<string>(value)).transform;
             _TaskAssignment.Pursuing_Targets.Remove(target_reached);
             target_reached.gameObject.GetComponent<Target>().TargetReachedByNode();
-            _TaskAssignment.AssignTasks(this, Unreached_Targets, _swarm.GetMembers());
+            _TaskAssignment.AssignTasks(this, _swarm.GetMembers());
         }
     }
 

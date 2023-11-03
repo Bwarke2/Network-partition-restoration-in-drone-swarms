@@ -20,7 +20,7 @@ public class Swarm : MonoBehaviour
 
     public Node Leader;
 
-    public PartitionPolicy PartitionPolicy = PartitionPolicy.PRP1;
+    public PartitionPolicy CurrentPartitionPolicy = PartitionPolicy.PRP1;
 
     void Awake()
     {
