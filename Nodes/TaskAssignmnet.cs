@@ -4,14 +4,19 @@ using UnityEngine;
 
 using Newtonsoft.Json;
 
-
+public struct Pursuing_Targets_struct
+{
+    public Transform target;
+    public float assign_time;
+}
 public class TaskAssignmnet
 {
-    public List<Transform> Unreached_Targets = new List<Transform>();
+    public List<Pursuing_Targets_struct> Unreached_Targets = new List<Pursuing_Targets_struct>();
     public List<Transform> Pursuing_Targets = new List<Transform>();
     public Dictionary<int, float> Bids = new Dictionary<int, float>();
     private Communication _com = null;
     private Movement _movement = null;
+    
 
     public void Setup(Communication com, Movement movement)
     {
@@ -116,8 +121,10 @@ public class TaskAssignmnet
         }
 
         //Debug.Log("Min bid: " + min_bid + " from: " + min_bid_id);
-        
-        Pursuing_Targets.Add(target);
+        Pursuing_Targets_struct target_struct = new Pursuing_Targets_struct();
+        target_struct.target = target;
+        target_struct.assign_time = Time.time;
+        Pursuing_Targets.Add(target_struct);
         Unreached_Targets.Remove(target);
 
         // Send task to winner
