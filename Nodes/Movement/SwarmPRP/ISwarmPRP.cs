@@ -4,7 +4,7 @@ using UnityEngine;
 
 interface ISwarmPRP : IMovementStrategy
 {
-    new void HandleLostNode(Node node)
+    void HandleLostNode(Node node)
     {
     }
 

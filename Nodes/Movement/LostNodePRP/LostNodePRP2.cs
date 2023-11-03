@@ -10,7 +10,7 @@ public class LostNodePRP2 : ILostNodePRP
     }
     public void Move(Node node)
     {
-        Debug.Log("Lost node PRP 2");
+        //Debug.Log("Lost node PRP 2");
         if (node.RP == null)
             return;
 
@@ -23,7 +23,7 @@ public class LostNodePRP2 : ILostNodePRP
 
     public void HandlePartitionRestored(Node node)
     {
-        if (node.Target == null)
+        if (_movement.GetTarget() == null)
         {
             _movement.SetStrategy(new NoTargetStrategy());
             return;

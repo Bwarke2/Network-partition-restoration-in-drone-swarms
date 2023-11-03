@@ -13,6 +13,7 @@ public class Communication : MonoBehaviour
     private Swarm _swarm;
     //Constants
     public const float com_range = 10;         //Communication range
+    public const float msg_loss = 0;         //Message loss probability in percent
     // Start is called before the first frame update
 
     void Awake()
@@ -115,7 +116,12 @@ public class Communication : MonoBehaviour
 
     public void ReceiveMsg(Node Recieving_node, MsgTypes msg_type, int sender_id, string value)
     {
-        // Handle unreliable communication
+        // Simulate unreliable communication
+        if (Random.Range(0, 100) < msg_loss)
+        {
+            Debug.Log("Message lost in " + Recieving_node.name + " of type: " + msg_type);
+            return;
+        }
         // Recieve msg
         switch (msg_type)
         {

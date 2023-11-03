@@ -11,10 +11,12 @@ public class TaskAssignmnet
     public List<Transform> Pursuing_Targets = new List<Transform>();
     public Dictionary<int, float> Bids = new Dictionary<int, float>();
     private Communication _com = null;
+    private Movement _movement = null;
 
-    public void Setup(Communication com)
+    public void Setup(Communication com, Movement movement)
     {
         _com = com;
+        _movement = movement;
     }
 
     public void AddBid(int bidder_id, float bid)
@@ -28,7 +30,7 @@ public class TaskAssignmnet
         Transform target_to_auction = GameObject.Find(JsonConvert.DeserializeObject<string>(value)).transform;
         //Find distance to target
         float distance = Vector2.Distance(RecieverNode.transform.position, target_to_auction.position);
-        if (RecieverNode.Target != null)
+        if (_movement.GetTarget() != null)
         {
             return;
         }

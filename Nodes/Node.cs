@@ -7,10 +7,9 @@ public class Node : MonoBehaviour
 {
     public int ID = 0;        //Node ID
     public const int Type = 0;      //Node Type
-    public const float Safe = 1;   //Safe distance from other nodes
     public Vector2 Position;        //Current node position
     public Vector2 P_start;   //Starting node position
-    public Transform Target = null;   //Target node position
+    //public Transform Target = null;   //Target node position
     public Vector2 RP;       //Rendezvous Point
     public float Bat = 100;         //Battery
     
@@ -40,9 +39,9 @@ public class Node : MonoBehaviour
         RP = P_start;
         _swarm = GameObject.FindGameObjectWithTag("Swarm").GetComponent<Swarm>();
         _com = GetComponent<Communication>();
-        _TaskAssignment.Setup(_com);
         _leaderElection.Startup(_com);
-        _movement = new Movement(_swarm,_com, new NoTargetStrategy());
+        _movement = new Movement(_swarm,_com, this, new NoTargetStrategy());
+        _TaskAssignment.Setup(_com,_movement);
     }
 
     void Start()
@@ -80,54 +79,13 @@ public class Node : MonoBehaviour
 
     void LateUpdate()
     {
-        DecideMoveStrat();
+        _movement.DecideMoveStrat(this);
         _movement.Move(this);
     }
 
-    public void DecideMoveStrat()
+    public int GetLeaderID()
     {
-        if (_swarm.GetMembers().Count < _com.GetNSN())
-        {
-            _movement.LostNodeEvent(this);
-            return;
-        }
-        _movement.PartitionRestoredEvent(this);
-
-        if (Target == null)
-        {
-            return;
-        }
-
-        float F_obj = FindFobj();
-        if (F_obj < 1)
-        {
-            if (debug_node)
-                Debug.Log("To far from Leader connection");
-            _movement.TooFarEvent(this, _com.GetConnectingNeighbor());
-            return;
-        }
-        //Check if too close to neighbour
-        float dist_to_closest_nb = Mathf.Infinity;
-        foreach (GameObject node in _com.GetNeighbours())
-        {
-            float dist = Vector2.Distance(node.transform.position, transform.position);
-            if (dist < dist_to_closest_nb)
-                dist_to_closest_nb = dist;
-            if (dist < Safe)
-            {
-                //Move away from node
-                List<Node> neighbours = new List<Node>();
-                foreach (GameObject go in _com.GetNeighbours())
-                {
-                    neighbours.Add(go.GetComponent<Node>());
-                }
-                _movement.TooCloseEvent(this, neighbours);
-                return;
-            }
-        }
-        /*
-        if (dist_to_closest_nb > Safe + 0.5 && F_obj > 1.1)
-            _movement.NormalRangeEvent(this);*/
+        return _leaderElection.GetLeaderID();
     }
 
     public float FindFobj() //Basic version
@@ -151,20 +109,6 @@ public class Node : MonoBehaviour
         return min_dist;
     }
 
-    public bool TargetReached()
-    {
-        //Check if target reached
-        if (Vector2.Distance(transform.position, Target.position) < 0.001f)
-        {
-            string value = JsonConvert.SerializeObject(Target.gameObject.name);
-            Target = null;
-            _movement.TargetReachedEvent(this);
-            _com.SendMsg(this, MsgTypes.TargetReachedMsg, _leaderElection.GetLeaderID(), value);
-            return true;
-        }
-        return false;
-    }
-
     public void SendRP()
     {
         // Add code to only allow setting when all nodes i connected
@@ -183,9 +127,6 @@ public class Node : MonoBehaviour
                         }));
         }
     }
-
-    
-
     public void SetTarget(Transform target, int node_id)
     {
         foreach (Node node in _swarm.GetMembers())
@@ -198,7 +139,7 @@ public class Node : MonoBehaviour
 
     public void SetOwnTarget(Transform target)
     {
-        Target = target;
+        _movement.SetTarget(target);
         _movement.NewTargetEvent(this);
     }
 

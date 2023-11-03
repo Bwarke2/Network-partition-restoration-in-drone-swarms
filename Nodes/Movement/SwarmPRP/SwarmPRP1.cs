@@ -22,9 +22,9 @@ public class SwarmPRP : ISwarmPRP
         node.transform.position = Vector2.MoveTowards(node.transform.position, desired_pos, step);
     }
 
-    new public void HandlePartitionRestored(Node node)
+    public void HandlePartitionRestored(Node node)
     {
-        if (node.Target == null)
+        if (_movement.GetTarget() == null)
         {
             _movement.SetStrategy(new NoTargetStrategy());
             return;

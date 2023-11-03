@@ -53,7 +53,7 @@ public class TooCloseStrategy : IMovementStrategy
 
     public void HandleNormalRange(Node node)
     {
-        if (node.Target == null)
+        if (_movement.GetTarget() == null)
         {
             _movement.SetStrategy(new NoTargetStrategy());
             return;
