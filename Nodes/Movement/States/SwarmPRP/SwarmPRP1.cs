@@ -22,8 +22,27 @@ public class SwarmPRP : ISwarmPRP
         node.transform.position = Vector2.MoveTowards(node.transform.position, desired_pos, step);
     }
 
+    public void HandleTooClose(Node node, List<Node> neighbors)
+    {
+        _movement.SetStrategy(new TooCloseStrategy());
+        
+        _movement.GetStrategy().SetNeighbors(neighbors);
+    }
+
+    public void HandleTooFar(Node node, Node connectingNode)
+    {
+        _movement.SetStrategy(new TooFarStrategy());
+        _movement.GetStrategy().SetConnectingNode(connectingNode);
+    }
+
     public void HandlePartitionRestored(Node node)
     {
+        float distance = Vector2.Distance(node.transform.position, node.RP);
+        if (distance > 1f)
+        {
+            //Debug.Log("Distance to RP: " + distance);
+            return;
+        }
         if (_movement.GetTarget() == null)
         {
             _movement.SetStrategy(new NoTargetStrategy());

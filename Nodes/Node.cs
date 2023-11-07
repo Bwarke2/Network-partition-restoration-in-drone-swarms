@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Newtonsoft.Json;
 
@@ -9,7 +10,7 @@ public class Node : MonoBehaviour
     public const int Type = 0;      //Node Type
     public Vector2 Position;        //Current node position
     public Vector2 P_start;   //Starting node position
-    //public Transform Target = null;   //Target node position
+    public Transform ShowTarget = null;   //Target node position
     public Vector2 RP;       //Rendezvous Point
     public float Bat = 100;         //Battery
     
@@ -57,6 +58,7 @@ public class Node : MonoBehaviour
             
             SendNewRP();
             StartCoroutine(UpdateRP());
+            StartCoroutine(TaskAssignment());
             _TaskAssignment.AssignTasks(this, _swarm.GetMembers());
         }
     }
@@ -82,6 +84,15 @@ public class Node : MonoBehaviour
             SendNewRP();
             //Debug.Log("RP updated");
             yield return new WaitForSeconds(1);
+        }
+    }
+
+    private IEnumerator TaskAssignment()
+    {
+        while (true)
+        {
+            _TaskAssignment.AssignTasks(this, _swarm.GetMembers());
+            yield return new WaitForSeconds(10);
         }
     }
 
@@ -155,13 +166,16 @@ public class Node : MonoBehaviour
         switch (_swarm.CurrentPartitionPolicy)
         {
             case PartitionPolicy.PRP1:
-                RP = _movement.Last_Target_Pos;
+                RP = _movement._Path.Last();
                 break;
             case PartitionPolicy.PRP2:
-                RP = _movement.Last_Target_Pos;
+                RP = _movement._Path.Last();
                 break;
             case PartitionPolicy.PRP3:
-                RP = _movement.GetTarget().position;
+                if (_movement.GetTarget() != null)
+                    RP = _movement.GetTarget().position;
+                else
+                    RP = _movement._Path.Last();
                 break;
         }
     }
@@ -177,6 +191,7 @@ public class Node : MonoBehaviour
 
     public void SetOwnTarget(Transform target)
     {
+        ShowTarget = target;
         _movement.SetTarget(target);
         _movement.NewTargetEvent(this);
     }
@@ -189,13 +204,28 @@ public class Node : MonoBehaviour
 
     public void TargetReachedMsgHandler(int sender_id, string value)
     {
+        //Add message to all nodes to remove target from list
+        Transform target = GameObject.Find(JsonConvert.DeserializeObject<string>(value)).transform;
+        
+        if (_movement.GetTarget() == target)
+        {
+            _movement.SetTarget(null);
+            ShowTarget = null;
+        }
+
         if (ID == _leaderElection.GetLeaderID())
         {
-            Transform target_reached = GameObject.Find(JsonConvert.DeserializeObject<string>(value)).transform;
-            _TaskAssignment.Pursuing_Targets.Remove(target_reached);
-            target_reached.gameObject.GetComponent<Target>().TargetReachedByNode();
-            _TaskAssignment.AssignTasks(this, _swarm.GetMembers());
+            if (!_TaskAssignment.RemovePursuingTarget(target))
+                Debug.Log("Target not found in pursuing list");
+            StartCoroutine(LeaderTargetReachedHandler(target));
         }
+    }
+
+    IEnumerator LeaderTargetReachedHandler(Transform target_reached)
+    {
+        yield return new WaitForSeconds(1);
+        _TaskAssignment.AssignTasks(this, _swarm.GetMembers());
+        target_reached.gameObject.GetComponent<Target>().TargetReachedByNode();
     }
 
     public void SetRPMsgHandler(int sender_id, string value) //Something is different here

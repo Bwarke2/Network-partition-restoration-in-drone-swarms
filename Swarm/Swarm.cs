@@ -75,4 +75,9 @@ public class Swarm : MonoBehaviour
     {
         return JoinedNodes;
     }
+
+    public List<GameObject> GetTargets()
+    {
+        return RemainingTargets;
+    }
 }

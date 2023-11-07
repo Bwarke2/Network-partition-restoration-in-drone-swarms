@@ -21,6 +21,17 @@ public class LostNodePRP2 : ILostNodePRP
         //Do nothing
     }
 
+    public void HandleNormalRange(Node node)
+    {
+        //Debug.Log("Lost node PRP 1");
+        if (_movement.GetTarget() == null)
+        {
+            _movement.SetStrategy(new NoTargetStrategy());
+            return;
+        }
+        _movement.SetStrategy(new TargetStrategy());
+    }
+
     public void HandlePartitionRestored(Node node)
     {
         if (_movement.GetTarget() == null)

@@ -22,6 +22,17 @@ public class LostNodePRP3 : ILostNodePRP
         node.transform.position = Vector2.MoveTowards(node.transform.position, desired_pos, step);
     }
 
+    public void HandleNormalRange(Node node)
+    {
+        //Debug.Log("Lost node PRP 1");
+        if (_movement.GetTarget() == null)
+        {
+            _movement.SetStrategy(new NoTargetStrategy());
+            return;
+        }
+        _movement.SetStrategy(new TargetStrategy());
+    }
+
     public void HandlePartitionRestored(Node node)
     {
         if (_movement.GetTarget() == null)

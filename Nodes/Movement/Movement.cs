@@ -9,6 +9,8 @@ public class Movement
     private Swarm _swarm;
     private Communication _com;
     private Transform _target;
+
+    public List<Vector2> _Path = new List<Vector2>();
     public Vector2 Last_Target_Pos;
     private Node _attached_node;
     public const float Safe = 1;   //Safe distance from other nodes
@@ -18,6 +20,7 @@ public class Movement
         _swarm = swarm;
         _com = com;
         _attached_node = node;
+        _Path.Add(node.transform.position);
         Last_Target_Pos = node.transform.position;
         SetStrategy(moveStrat);
     }
@@ -33,11 +36,14 @@ public class Movement
         _moveStrat.SetMovement(this);
     }
 
-    public void SetTarget(Transform target)
+    public void SetTarget(Transform new_target)
     {
+        _Path.Add(_attached_node.transform.position);
+        if (new_target == null)
+            //Debug.Log("Setting target to null in node: " + _attached_node.name);
         if (_target != null)
             Last_Target_Pos = _target.position;
-        _target = target;
+        _target = new_target;
     }
 
     public Transform GetTarget()
@@ -71,13 +77,9 @@ public class Movement
             LostNodeEvent(in_node);
             return;
         }
-        PartitionRestoredEvent(in_node);
-
-        if (_target == null)
-        {
-            return;
-        }
-
+        
+        CheckIfPartitionIsRestored(in_node);
+        
         float F_obj = in_node.FindFobj();
         if (F_obj < 1)
         {
@@ -103,6 +105,22 @@ public class Movement
                 }
                 TooCloseEvent(in_node, neighbours);
                 return;
+            }
+        }
+
+        if (_target == null)
+        {
+            return;
+        }
+    }
+
+    private void CheckIfPartitionIsRestored(Node in_node)
+    {
+        if (_moveStrat is ILostNodePRP || _moveStrat is ISwarmPRP)
+        {
+            if (_swarm.GetMembers().Count == _com.GetNSN())
+            {
+                PartitionRestoredEvent(in_node);
             }
         }
     }
@@ -140,5 +158,11 @@ public class Movement
     public void NormalRangeEvent(Node node)
     {
         _moveStrat.HandleNormalRange(node);
+    }
+
+    public void NoMovementEvent(Node node)
+    {
+        //Implement later
+        //_moveStrat.HandleNoMovement(node);
     }
 }
