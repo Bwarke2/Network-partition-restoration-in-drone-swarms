@@ -9,12 +9,14 @@ public class Communication : MonoBehaviour
     public bool ConnectedToLeader = false; //Connected to leader
     public Node ConnnectingNeighbor;       //Connecting neighbour
     private int NSN;             // Node start number
+    private Swarm _swarm;   //Swarm object
 
-    private Swarm _swarm;
     //Constants
     public const float com_range = 10;         //Communication range
     public const float msg_loss = 0;         //Message loss probability in percent
-    // Start is called before the first frame update
+    
+    //Metrics
+    private int _num_sent_msgs = 0;
 
     void Awake()
     {
@@ -107,6 +109,7 @@ public class Communication : MonoBehaviour
             //Debug.Log("Checking node: " + node.ID);
             if (node.ID == recv_id)
             {
+                _num_sent_msgs++;
                 ReceiveMsg(node, msg_type, sender_node.ID, value);
                 return;
             }
@@ -180,5 +183,10 @@ public class Communication : MonoBehaviour
     public int GetNSN()
     {
         return NSN;
+    }
+
+    public int GetNumSentMsgs()
+    {
+        return _num_sent_msgs;
     }
 }

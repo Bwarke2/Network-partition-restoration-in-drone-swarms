@@ -14,6 +14,12 @@ public class Node : MonoBehaviour
     public Vector2 RP;       //Rendezvous Point
     public float Bat = 100;         //Battery
     
+    //Metrics
+    public float totalDistance = 0;
+    private Vector3 previousLoc = Vector3.zero; //Used to calculate total distance
+
+    public int NumSentMsgs = 0;
+
     //Movement strategy
     private Movement _movement = null;
     
@@ -73,8 +79,16 @@ public class Node : MonoBehaviour
 
     void LateUpdate()
     {
+        RecordDistance();
         _movement.DecideMoveStrat(this);
         _movement.Move(this);
+        NumSentMsgs = GetNumSentMsgs();
+    }
+
+    private void RecordDistance()
+    {
+        totalDistance += Vector3.Distance(transform.position, previousLoc);
+	    previousLoc = transform.position;
     }
 
     private IEnumerator UpdateRP()
@@ -178,6 +192,11 @@ public class Node : MonoBehaviour
                     RP = _movement._Path.Last();
                 break;
         }
+    }
+
+    public int GetNumSentMsgs()
+    {
+        return _com.GetNumSentMsgs();
     }
     public void SetTarget(Transform target, int node_id)
     {

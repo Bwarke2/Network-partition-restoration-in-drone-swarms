@@ -72,25 +72,37 @@ public class Movement
 
     public void DecideMoveStrat(Node in_node)
     {
+        //Check if partition has happened
         if (_swarm.GetMembers().Count < _com.GetNSN())
         {
             LostNodeEvent(in_node);
             return;
         }
         
+        //Check if partition is restored
         CheckIfPartitionIsRestored(in_node);
-        
+
+        //Check if to far from connecting node
         float F_obj = in_node.FindFobj();
         if (F_obj < 1)
         {
-            /*if (debug_node)
-                Debug.Log("To far from Leader connection");*/
             TooFarEvent(in_node, _com.GetConnectingNeighbor());
             return;
         }
         //Check if too close to neighbour
+        CheckIfToClose(in_node, _com.GetNeighbours());
+
+        //Check if target is null
+        if (_target == null)
+        {
+            return;
+        }
+    }
+
+    private void CheckIfToClose(Node in_node, List<GameObject> NB)
+    {
         float dist_to_closest_nb = Mathf.Infinity;
-        foreach (GameObject node_obj in _com.GetNeighbours())
+        foreach (GameObject node_obj in NB)
         {
             float dist = Vector2.Distance(node_obj.transform.position, in_node.transform.position);
             if (dist < dist_to_closest_nb)
@@ -99,18 +111,13 @@ public class Movement
             {
                 //Move away from node
                 List<Node> neighbours = new List<Node>();
-                foreach (GameObject go in _com.GetNeighbours())
+                foreach (GameObject go in NB)
                 {
                     neighbours.Add(go.GetComponent<Node>());
                 }
                 TooCloseEvent(in_node, neighbours);
                 return;
             }
-        }
-
-        if (_target == null)
-        {
-            return;
         }
     }
 
