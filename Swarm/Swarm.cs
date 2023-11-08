@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 using UnityEngine;
+using System.IO;
 
 public enum PartitionPolicy
 {
@@ -93,9 +94,20 @@ public class Swarm : MonoBehaviour
             Debug.Log("All targets reached");
             _simmulationRunning = false;
 
+            //Save results to file
+            SaveResults();
+
             //Restart scene
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
+    }
+
+    private void SaveResults()
+    {
+        string path = "Assets/Results/test.txt";
+        StreamWriter writer = new StreamWriter(path, true);
+        writer.WriteLine(timer.GetTimer() + ";" + NumSentMsgs + ";" + TotalDistance);
+        writer.Close();
     }
 
     public void AddMember(Node node)
