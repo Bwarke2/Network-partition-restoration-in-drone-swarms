@@ -18,6 +18,7 @@ public class Swarm : MonoBehaviour
     public MyTimer timer;
     public List<Node> JoinedNodes = new List<Node>();
     public List<GameObject> LostNodes = new List<GameObject>();
+    public int NumDroppedNodes = 0;
     public List<GameObject> RemainingTargets = new List<GameObject>();
 
     private bool _simmulationRunning = false;
@@ -105,6 +106,20 @@ public class Swarm : MonoBehaviour
     private void SaveResults()
     {
         string path = "Assets/Results/test.txt";
+        switch (CurrentPartitionPolicy)
+        {
+            case PartitionPolicy.PRP1:
+                path = "Assets/Results/PRP1.txt";
+                break;
+            case PartitionPolicy.PRP2:
+                path = "Assets/Results/PRP2.txt";
+                break;
+            case PartitionPolicy.PRP3:
+                path = "Assets/Results/PRP3.txt";
+                break;
+            default:
+                break;
+        }
         StreamWriter writer = new StreamWriter(path, true);
         writer.WriteLine(timer.GetTimer() + ";" + NumSentMsgs + ";" + TotalDistance);
         writer.Close();
@@ -135,5 +150,11 @@ public class Swarm : MonoBehaviour
     public List<GameObject> GetTargets()
     {
         return RemainingTargets;
+    }
+
+    public void AddDroppedNode(int numOfDroppedNodes)
+    {
+        NumDroppedNodes += numOfDroppedNodes;
+        Debug.Log("Dropped nodes: " + NumDroppedNodes);
     }
 }

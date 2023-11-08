@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Newtonsoft.Json;
 
-public class Movement
+public class Movement : MonoBehaviour
 {
     private IMovementStrategy _moveStrat = new NoTargetStrategy();
     private Swarm _swarm;
@@ -14,8 +14,9 @@ public class Movement
     public Vector2 Last_Target_Pos;
     private Node _attached_node;
     public const float Safe = 1;   //Safe distance from other nodes
+    public bool _waitingForLostNode = false;
 
-    public Movement(Swarm swarm, Communication com, Node node, IMovementStrategy moveStrat)
+    public void Setup(Swarm swarm, Communication com, Node node, IMovementStrategy moveStrat)
     {
         _swarm = swarm;
         _com = com;
@@ -32,8 +33,12 @@ public class Movement
 
     public void SetStrategy(IMovementStrategy moveStrat)
     {
-        _moveStrat = moveStrat;
-        _moveStrat.SetMovement(this);
+        //Debug.Log("Node " + _attached_node.name +" Setting strategy to: " + moveStrat.GetType().Name);
+        if (_moveStrat != moveStrat)
+        {
+            _moveStrat = moveStrat;
+            _moveStrat.SetMovement(this);
+        }
     }
 
     public void SetTarget(Transform new_target)
@@ -125,7 +130,7 @@ public class Movement
     {
         if (_moveStrat is ILostNodePRP || _moveStrat is ISwarmPRP)
         {
-            if (_swarm.GetMembers().Count == _com.GetNSN())
+            if (_swarm.GetMembers().Count >= _com.GetNSN())
             {
                 PartitionRestoredEvent(in_node);
             }
@@ -139,6 +144,12 @@ public class Movement
 
     public void PartitionRestoredEvent(Node node)
     {
+        if (_waitingForLostNode)
+        {
+            StopCoroutine(WaitForLostNode());
+            _waitingForLostNode = false;
+        }
+        
         _moveStrat.HandlePartitionRestored(node);
     }
 
@@ -171,5 +182,40 @@ public class Movement
     {
         //Implement later
         //_moveStrat.HandleNoMovement(node);
+    }
+
+    public void LostNodeDroppedEvent(Node node)
+    {
+        _moveStrat.HandleLostNodeDropped(node);
+    }
+
+    public void LostNodeDroppedMsgHandler(int sender_id, string value)
+    {
+        int num_of_members = JsonConvert.DeserializeObject<int>(value);
+        Debug.Log("Lost node dropped in node: " + _attached_node.name + ", new NSN: " + num_of_members);
+        _com.SetNSN(num_of_members);
+        _moveStrat.HandleLostNodeDropped(_attached_node);   
+    }
+
+    public void RPReachedByLeaderEvent()
+    {
+        StartCoroutine(WaitForLostNode());
+    }
+
+    IEnumerator WaitForLostNode()
+    {
+        _waitingForLostNode = true;
+        yield return new WaitForSeconds(10);
+        Debug.Log("Done waiting for lost node");
+        int numOfMembers = _swarm.GetMembers().Count;
+        int numOfDroppedNodes = _com.GetNSN() - numOfMembers;
+        _swarm.AddDroppedNode(numOfDroppedNodes);
+        _com.SetNSN(numOfMembers);
+        _com.BroadcastMsg(this._attached_node, MsgTypes.LostNodeDroppedMsg, JsonConvert.SerializeObject(numOfMembers, Formatting.None,
+                        new JsonSerializerSettings()
+                        { 
+                            ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                        }));
+        _moveStrat.HandleLostNodeDropped(_attached_node);  
     }
 }

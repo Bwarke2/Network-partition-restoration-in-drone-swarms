@@ -20,8 +20,8 @@ public class Node : MonoBehaviour
 
     public int NumSentMsgs = 0;
 
-    //Movement strategy
-    private Movement _movement = null;
+    //Movement component
+    private Movement _movement;
     
     //Communication attributes
     private Communication _com;
@@ -47,7 +47,8 @@ public class Node : MonoBehaviour
         _swarm = GameObject.FindGameObjectWithTag("Swarm").GetComponent<Swarm>();
         _com = GetComponent<Communication>();
         _leaderElection.Startup(_com);
-        _movement = new Movement(_swarm,_com, this, new NoTargetStrategy());
+        _movement = GetComponent<Movement>();
+        _movement.Setup(_swarm,_com, this, new NoTargetStrategy());
         _TaskAssignment.Setup(_com,_movement);
     }
 
@@ -273,4 +274,12 @@ public class Node : MonoBehaviour
         //Debug.Log("Recieved broadcast winner msg");
         _leaderElection.HandleBroadcastWinnerMsg(sender_id, value);
     }
+
+    public void LostNodeDroppedMsgHandler(int sender_id, string value)
+    {
+        //Debug.Log("Recieved lost node dropped msg");
+        _movement.LostNodeDroppedMsgHandler(sender_id, value);
+    }
+
+    
 }

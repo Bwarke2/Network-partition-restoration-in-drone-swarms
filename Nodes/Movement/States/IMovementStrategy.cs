@@ -48,5 +48,6 @@ public interface IMovementStrategy
     public void HandleTooClose(Node node, List<Node> Neighbors){}
     public void HandleTooFar(Node node, Node ConnectingNode){}
     public void HandleNormalRange(Node node){}
+    public void HandleLostNodeDropped(Node node){}
     abstract void Move(Node node);
 }

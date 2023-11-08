@@ -8,5 +8,6 @@
         RollCallMsg,
         RollCallResponseMsg,
         AnounceAuctionMsg,
-        ReturnBitMsg
+        ReturnBitMsg,
+        LostNodeDroppedMsg
     }

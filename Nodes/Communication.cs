@@ -117,6 +117,20 @@ public class Communication : MonoBehaviour
         Debug.Log("No reciever mached id: " + recv_id);
     }
 
+    public void BroadcastMsg(Node sender_node, MsgTypes msg_type, string value)
+    {
+        //Debug.Log("Broadcasting to " + _swarm.GetMembers().Count + " nodes");
+        foreach (Node node in _swarm.GetMembers())
+        {
+            //Debug.Log("Recieved broadcast in node: " + node.ID);
+            if (node.ID != sender_node.ID)
+            {
+                _num_sent_msgs++;
+                ReceiveMsg(node, msg_type, sender_node.ID, value);
+            }
+        }
+    }
+
     public void ReceiveMsg(Node Recieving_node, MsgTypes msg_type, int sender_id, string value)
     {
         // Simulate unreliable communication
@@ -154,6 +168,9 @@ public class Communication : MonoBehaviour
             case MsgTypes.Broadcast_WinnerMsg:
                 Recieving_node.BroadcastWinnerMsgHandler(sender_id, value);
                 break;
+            case MsgTypes.LostNodeDroppedMsg:
+                Recieving_node.LostNodeDroppedMsgHandler(sender_id, value);
+                break;  
         }
     }
 
@@ -184,6 +201,11 @@ public class Communication : MonoBehaviour
     {
         return NSN;
     }
+
+    public void SetNSN(int nsn)
+    {
+        NSN = nsn;
+    } 
 
     public int GetNumSentMsgs()
     {

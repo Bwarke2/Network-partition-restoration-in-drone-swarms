@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-public class MyTimer : MonoBehaviour
+public class MyCountdownTimer : MonoBehaviour
 {
     public float timeLeft = 0;
     public bool timerActive = false;
@@ -32,7 +32,7 @@ public class MyTimer : MonoBehaviour
         timerActive = false;
     }   
 
-    private void OnTimerEnd()
+    private void OnTimerEndEvent()
     {
         Debug.Log("Timer ended");
     }
