@@ -27,6 +27,11 @@ public class LostNodePRP1 : ILostNodePRP
 
     public void HandlePartitionRestored(Node node)
     {
-        
+        if (_movement.GetTarget() == null)
+        {
+            _movement.SetStrategy(new NoTargetStrategy());
+            return;
+        }
+        _movement.SetStrategy(new TargetStrategy());
     }
 }

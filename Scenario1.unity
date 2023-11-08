@@ -789,7 +789,7 @@ Transform:
   m_GameObject: {fileID: 450051662}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 9.94, y: -8.08, z: 0}
+  m_LocalPosition: {x: 12.81, y: -10.07, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -996,6 +996,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _Path: []
   Last_Target_Pos: {x: 0, y: 0}
+  _waitingForLostNode: 0
 --- !u!1 &456151649
 GameObject:
   m_ObjectHideFlags: 0
@@ -2395,7 +2396,7 @@ MonoBehaviour:
   TotalDistance: 0
   NumSentMsgs: 0
   Leader: {fileID: 0}
-  CurrentPartitionPolicy: 2
+  CurrentPartitionPolicy: 0
   UIControl: {fileID: 0}
 --- !u!4 &1139561392
 Transform:
@@ -2657,6 +2658,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _Path: []
   Last_Target_Pos: {x: 0, y: 0}
+  _waitingForLostNode: 0
 --- !u!1 &1232450491
 GameObject:
   m_ObjectHideFlags: 0
@@ -2896,6 +2898,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _Path: []
   Last_Target_Pos: {x: 0, y: 0}
+  _waitingForLostNode: 0
 --- !u!1 &1278222284
 GameObject:
   m_ObjectHideFlags: 0
@@ -3166,7 +3169,7 @@ Transform:
   m_GameObject: {fileID: 1463340289}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 17.21, y: -6.799999, z: 0}
+  m_LocalPosition: {x: 20.08, y: -8.789999, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -3373,6 +3376,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _Path: []
   Last_Target_Pos: {x: 0, y: 0}
+  _waitingForLostNode: 0
 --- !u!1 &1479818617
 GameObject:
   m_ObjectHideFlags: 0
@@ -3696,6 +3700,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _Path: []
   Last_Target_Pos: {x: 0, y: 0}
+  _waitingForLostNode: 0
 --- !u!1 &1523700320
 GameObject:
   m_ObjectHideFlags: 0
@@ -4494,6 +4499,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _Path: []
   Last_Target_Pos: {x: 0, y: 0}
+  _waitingForLostNode: 0
 --- !u!1 &1942033683
 GameObject:
   m_ObjectHideFlags: 0
