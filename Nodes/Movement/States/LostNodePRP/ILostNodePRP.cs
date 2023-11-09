@@ -4,7 +4,5 @@ using UnityEngine;
 
 interface ILostNodePRP : IMovementStrategy
 {
-    void HandleLostNode(Node node)
-    {
-    }
+    
 }

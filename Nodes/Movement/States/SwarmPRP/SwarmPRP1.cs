@@ -2,13 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SwarmPRP : ISwarmPRP
+public class SwarmPRP : IMovementStrategy
 {
     private Movement _movement;
     public void SetMovement(Movement movement)
     {
         _movement = movement;
     }
+
     public void Move(Node node)
     {
         //Debug.Log("Swarm PRP");

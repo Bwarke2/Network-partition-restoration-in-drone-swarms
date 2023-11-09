@@ -27,6 +27,34 @@ public class TargetStrategy : IMovementStrategy
         _movement.GetStrategy().SetConnectingNode(connectingNode);
     }
 
+    public void HandleLostNode(Node node, Communication com, Movement movement, Swarm swarm)
+    {
+        IMovementStrategy newStrat;
+        if (com.ConnectedToLeader == false)
+        {
+            switch (swarm.CurrentPartitionPolicy)
+            {
+                case PartitionPolicy.PRP1:
+                    newStrat = new LostNodePRP1();
+                    break;
+                case PartitionPolicy.PRP2:
+                    newStrat = new LostNodePRP2();
+                    break;
+                case PartitionPolicy.PRP3:
+                    newStrat = new LostNodePRP3();
+                    break;
+                default:
+                    newStrat = new LostNodePRP1();
+                    break;
+            }
+        }
+        else
+        {
+            newStrat = new SwarmPRP();
+        }
+        movement.SetStrategy(newStrat);
+    }
+
     public void Move(Node node)
     {
         //Debug.Log("Moving towards target");

@@ -18,6 +18,7 @@ public class Swarm : MonoBehaviour
     public MyTimer timer;
     public List<Node> JoinedNodes = new List<Node>();
     public List<GameObject> LostNodes = new List<GameObject>();
+    public List<GameObject> DroppedNodes = new List<GameObject>();
     public int NumDroppedNodes = 0;
     public List<GameObject> RemainingTargets = new List<GameObject>();
 
@@ -121,7 +122,7 @@ public class Swarm : MonoBehaviour
                 break;
         }
         StreamWriter writer = new StreamWriter(path, true);
-        writer.WriteLine(timer.GetTimer() + ";" + NumSentMsgs + ";" + TotalDistance);
+        writer.WriteLine(timer.GetTimer() + ";" + NumSentMsgs + ";" + TotalDistance + ";" + DroppedNodes.Count);
         writer.Close();
     }
 
@@ -131,6 +132,11 @@ public class Swarm : MonoBehaviour
             JoinedNodes.Add(node);
         if (LostNodes.Contains(node.gameObject) == true)
             LostNodes.Remove(node.gameObject);
+        if (DroppedNodes.Contains(node.gameObject) == true)
+        {
+            DroppedNodes.Remove(node.gameObject);
+            NumDroppedNodes = DroppedNodes.Count;
+        }
     }
 
     public void RemoveMember(Node node)
@@ -152,9 +158,11 @@ public class Swarm : MonoBehaviour
         return RemainingTargets;
     }
 
-    public void AddDroppedNode(int numOfDroppedNodes)
+    public void AddDroppedNode()
     {
-        NumDroppedNodes += numOfDroppedNodes;
+        DroppedNodes.AddRange(LostNodes);
+        LostNodes.Clear();
+        NumDroppedNodes = DroppedNodes.Count;
         Debug.Log("Dropped nodes: " + NumDroppedNodes);
     }
 }

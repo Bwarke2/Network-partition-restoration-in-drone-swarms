@@ -51,6 +51,34 @@ public class TooCloseStrategy : IMovementStrategy
         node.transform.position = Vector2.MoveTowards(node.transform.position, desired_pos, step);
     }
 
+    public void HandleLostNode(Node node, Communication com, Movement movement, Swarm swarm)
+    {
+        IMovementStrategy newStrat;
+        if (com.ConnectedToLeader == false)
+        {
+            switch (swarm.CurrentPartitionPolicy)
+            {
+                case PartitionPolicy.PRP1:
+                    newStrat = new LostNodePRP1();
+                    break;
+                case PartitionPolicy.PRP2:
+                    newStrat = new LostNodePRP2();
+                    break;
+                case PartitionPolicy.PRP3:
+                    newStrat = new LostNodePRP3();
+                    break;
+                default:
+                    newStrat = new LostNodePRP1();
+                    break;
+            }
+        }
+        else
+        {
+            newStrat = new SwarmPRP();
+        }
+        movement.SetStrategy(newStrat);
+    }
+
     public void HandleNormalRange(Node node)
     {
         if (_movement.GetTarget() == null)

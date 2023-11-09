@@ -10,7 +10,8 @@ public class Movement : MonoBehaviour
     private Communication _com;
     private Transform _target;
 
-    public List<Vector2> _Path = new List<Vector2>();
+    public List<Vector2> Path = new List<Vector2>();
+    private Queue<Vector2> _lastPositions = new Queue<Vector2>();
     public Vector2 Last_Target_Pos;
     private Node _attached_node;
     public const float Safe = 1;   //Safe distance from other nodes
@@ -21,7 +22,7 @@ public class Movement : MonoBehaviour
         _swarm = swarm;
         _com = com;
         _attached_node = node;
-        _Path.Add(node.transform.position);
+        Path.Add(node.transform.position);
         Last_Target_Pos = node.transform.position;
         SetStrategy(moveStrat);
     }
@@ -29,11 +30,49 @@ public class Movement : MonoBehaviour
     public void Move(Node node)
     {
         _moveStrat.Move(node);
+        if (_lastPositions.Count >= 40)
+            _lastPositions.Dequeue();
+        _lastPositions.Enqueue(node.transform.position);
+
+        if (!CheckIfMoved(FindAveragePosition(), node.transform.position))
+        {
+            //if (node.debug_node == true)
+                //Debug.Log("Node " + node.name + " did not move");
+            NoMovementEvent(node);
+        }
+            
+    }
+
+    private Vector2 FindAveragePosition()
+    {
+        Vector2 average = Vector2.zero;
+        foreach (Vector2 pos in _lastPositions)
+        {
+            average += pos;
+        }
+        average /= _lastPositions.Count;
+        return average;
+    }
+
+    private bool CheckIfMoved(Vector2 averagePos, Vector2 currentPos)
+    {
+        float dist = Vector2.Distance(averagePos, currentPos);
+        //if (_attached_node.debug_node == true)
+            //Debug.Log("Distance moved: " + dist);
+        if (dist < 0.005)
+        {
+            //Debug.Log("Node did not move");
+            return false;
+        }
+            
+
+        return true;
     }
 
     public void SetStrategy(IMovementStrategy moveStrat)
     {
-        //Debug.Log("Node " + _attached_node.name +" Setting strategy to: " + moveStrat.GetType().Name);
+        if (_attached_node.debug_node == true)
+            Debug.Log("Node " + _attached_node.name +" Setting strategy to: " + moveStrat.GetType().Name);
         if (_moveStrat != moveStrat)
         {
             _moveStrat = moveStrat;
@@ -43,7 +82,7 @@ public class Movement : MonoBehaviour
 
     public void SetTarget(Transform new_target)
     {
-        _Path.Add(_attached_node.transform.position);
+        Path.Add(_attached_node.transform.position);
         if (new_target == null)
             //Debug.Log("Setting target to null in node: " + _attached_node.name);
         if (_target != null)
@@ -128,12 +167,9 @@ public class Movement : MonoBehaviour
 
     private void CheckIfPartitionIsRestored(Node in_node)
     {
-        if (_moveStrat is ILostNodePRP || _moveStrat is ISwarmPRP)
+        if (_swarm.GetMembers().Count >= _com.GetNSN())
         {
-            if (_swarm.GetMembers().Count >= _com.GetNSN())
-            {
-                PartitionRestoredEvent(in_node);
-            }
+            PartitionRestoredEvent(in_node);
         }
     }
 
@@ -149,7 +185,7 @@ public class Movement : MonoBehaviour
             StopCoroutine(WaitForLostNode());
             _waitingForLostNode = false;
         }
-        
+        _com.SetNSN(_swarm.GetMembers().Count);
         _moveStrat.HandlePartitionRestored(node);
     }
 
@@ -181,7 +217,7 @@ public class Movement : MonoBehaviour
     public void NoMovementEvent(Node node)
     {
         //Implement later
-        //_moveStrat.HandleNoMovement(node);
+        _moveStrat.HandleNoMovement(node);
     }
 
     public void LostNodeDroppedEvent(Node node)
@@ -208,8 +244,7 @@ public class Movement : MonoBehaviour
         yield return new WaitForSeconds(10);
         Debug.Log("Done waiting for lost node");
         int numOfMembers = _swarm.GetMembers().Count;
-        int numOfDroppedNodes = _com.GetNSN() - numOfMembers;
-        _swarm.AddDroppedNode(numOfDroppedNodes);
+        _swarm.AddDroppedNode();
         _com.SetNSN(numOfMembers);
         _com.BroadcastMsg(this._attached_node, MsgTypes.LostNodeDroppedMsg, JsonConvert.SerializeObject(numOfMembers, Formatting.None,
                         new JsonSerializerSettings()

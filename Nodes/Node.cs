@@ -181,16 +181,16 @@ public class Node : MonoBehaviour
         switch (_swarm.CurrentPartitionPolicy)
         {
             case PartitionPolicy.PRP1:
-                RP = _movement._Path.Last();
+                RP = _movement.Path.Last();
                 break;
             case PartitionPolicy.PRP2:
-                RP = _movement._Path.Last();
+                RP = _movement.Path.Last();
                 break;
             case PartitionPolicy.PRP3:
                 if (_movement.GetTarget() != null)
                     RP = _movement.GetTarget().position;
                 else
-                    RP = _movement._Path.Last();
+                    RP = _movement.Path.Last();
                 break;
         }
     }

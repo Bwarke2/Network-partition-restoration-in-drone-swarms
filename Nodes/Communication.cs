@@ -8,6 +8,7 @@ public class Communication : MonoBehaviour
     public int Hops = int.MaxValue;        //Number of hops to leader
     public bool ConnectedToLeader = false; //Connected to leader
     public Node ConnnectingNeighbor;       //Connecting neighbour
+    [SerializeField]
     private int NSN;             // Node start number
     private Swarm _swarm;   //Swarm object
 

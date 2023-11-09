@@ -42,4 +42,16 @@ public class LostNodePRP3 : ILostNodePRP
         }
         _movement.SetStrategy(new TargetStrategy());
     }
+
+    public virtual void HandleNoMovement(Node node)
+    {
+        //Go to last position instead of RP
+        //Debug.Log("No movement in node " + node.ID + " going to last position");
+        if (_movement.Path.Count == 0)
+        {
+            //Debug.Log("Path is empty");
+            return;
+        }
+        _movement.SetStrategy(new LostNodePRP2_returnpath());
+    }
 }
