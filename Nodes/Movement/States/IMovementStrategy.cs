@@ -21,6 +21,7 @@ public interface IMovementStrategy
     public void HandleTooClose(Node node, List<Node> Neighbors){}
     public void HandleTooFar(Node node, Node ConnectingNode){}
     public void HandleNormalRange(Node node){}
+    public void HandleNoSwarmMovement(Node node, Transform newTarget){}
     virtual public void HandleLostNodeDropped(Node node){}
     virtual public void HandleNoMovement(Node node){}
     virtual void Move(Node node){}

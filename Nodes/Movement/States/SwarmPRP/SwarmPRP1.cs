@@ -20,9 +20,10 @@ public class SwarmPRP : IMovementStrategy
 
         if (Vector2.Distance(node.transform.position, node.RP) < 3f)
         {
-            if ((node.ID == node.GetLeaderID()) && (_movement._waitingForLostNode == false))
+            _movement.SetWaitingForLostNode(true);
+            if ((node.ID == node.GetLeaderID()) && (_movement.GetWaitingForLostNode() == false))
             {
-                _movement._waitingForLostNode = true;
+                
                 Debug.Log("Waiting for lost node");
                 _movement.RPReachedByLeaderEvent();
             }
@@ -34,7 +35,6 @@ public class SwarmPRP : IMovementStrategy
         float step = IMovementStrategy._speed * Time.deltaTime;
         Vector2 desired_pos = node.RP;
         node.transform.position = Vector2.MoveTowards(node.transform.position, desired_pos, step);
-
     }
 
     public void HandleTooClose(Node node, List<Node> neighbors)
@@ -75,5 +75,11 @@ public class SwarmPRP : IMovementStrategy
             return;
         }
         _movement.SetStrategy(new TargetStrategy());
+    }
+
+    public void HandleNoMovement(Node node)
+    {
+        if(_movement.GetWaitingForLostNode() == false)
+            Debug.Log("Failed to reach RP");
     }
 }

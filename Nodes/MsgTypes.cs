@@ -9,5 +9,6 @@
         RollCallResponseMsg,
         AnounceAuctionMsg,
         ReturnBitMsg,
-        LostNodeDroppedMsg
+        LostNodeDroppedMsg,
+        SwarmStuckMsg
     }

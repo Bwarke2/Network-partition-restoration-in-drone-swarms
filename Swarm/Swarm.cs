@@ -23,6 +23,7 @@ public class Swarm : MonoBehaviour
     public List<GameObject> RemainingTargets = new List<GameObject>();
 
     private bool _simmulationRunning = false;
+    private Queue<Vector2> _lastPositions = new Queue<Vector2>();
 
     //Metrics
     public float TotalDistance = 0;
@@ -51,6 +52,7 @@ public class Swarm : MonoBehaviour
     {
         timer.StartTimer();
         _simmulationRunning = true;
+        StartCoroutine(UpdateCentralPosition());
     }
 
     // Update is called once per frame
@@ -66,12 +68,52 @@ public class Swarm : MonoBehaviour
         }
     }
 
+    private IEnumerator UpdateCentralPosition()
+    {
+        while (_simmulationRunning)
+        {
+            Vector2 newCenter = FindCenterPositionOfSwarm();
+            _lastPositions.Enqueue(newCenter);
+            if (_lastPositions.Count >= 5)
+            {
+                if (CheckIfMoved(newCenter,_lastPositions) == false)
+                {
+                    Debug.Log("Swarm did not move");
+                    Leader.RaiseNoSwarmMovementEvent();
+                }
+                _lastPositions.Clear();
+            }
+            //Debug.Log("RP updated");
+            yield return new WaitForSeconds(1);
+        }
+    }
+
+    private bool CheckIfMoved(Vector2 currentCenter, Queue<Vector2> lastPositions)
+    {
+        Vector2 average = Vector2.zero;
+        foreach (Vector2 pos in lastPositions)
+        {
+            average += pos;
+        }
+        average /= lastPositions.Count;
+
+        float dist = Vector2.Distance(average, currentCenter);
+        //Debug.Log("Distance moved by swarm: " + dist);
+        //Debug.Log("Average position: " + average + " Current position: " + currentCenter);
+        if (dist < 0.2)
+        {
+            Debug.Log("Swarm did not move");
+            return false;
+        }
+        return true;
+    }
+
     private float CalTotalDistance()
     {
         float distance = 0;
-        foreach (GameObject node_go in swarm)
+        foreach (Node node_go in GetMembers())
         {
-            distance += node_go.GetComponent<Node>().totalDistance;
+            distance += node_go.totalDistance;
         }
         return distance;
     }
@@ -79,9 +121,9 @@ public class Swarm : MonoBehaviour
     private int CalTotalSentMsgs()
     {
         int msgs = 0;
-        foreach (GameObject node_go in swarm)
+        foreach (Node node_go in GetMembers())
         {
-            msgs += node_go.GetComponent<Node>().NumSentMsgs;
+            msgs += node_go.NumSentMsgs;
         }
         return msgs;
     }
@@ -122,7 +164,7 @@ public class Swarm : MonoBehaviour
                 break;
         }
         StreamWriter writer = new StreamWriter(path, true);
-        writer.WriteLine(timer.GetTimer() + ";" + NumSentMsgs + ";" + TotalDistance + ";" + DroppedNodes.Count);
+        writer.WriteLine(timer.GetTimer() + ";" + NumSentMsgs + ";" + TotalDistance + ";" + (swarm.Count - GetMembers().Count));
         writer.Close();
     }
 
@@ -164,5 +206,16 @@ public class Swarm : MonoBehaviour
         LostNodes.Clear();
         NumDroppedNodes = DroppedNodes.Count;
         Debug.Log("Dropped nodes: " + NumDroppedNodes);
+    }
+
+    private Vector2 FindCenterPositionOfSwarm()
+    {
+        Vector2 center = Vector2.zero;
+        foreach (Node node in GetMembers())
+        {
+            center += (Vector2)node.transform.position;
+        }
+        center /= GetMembers().Count;
+        return center;
     }
 }

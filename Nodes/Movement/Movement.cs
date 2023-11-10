@@ -15,7 +15,7 @@ public class Movement : MonoBehaviour
     public Vector2 Last_Target_Pos;
     private Node _attached_node;
     public const float Safe = 1;   //Safe distance from other nodes
-    public bool _waitingForLostNode = false;
+    private bool _waitingForLostNode = false;
 
     public void Setup(Swarm swarm, Communication com, Node node, IMovementStrategy moveStrat)
     {
@@ -30,17 +30,17 @@ public class Movement : MonoBehaviour
     public void Move(Node node)
     {
         _moveStrat.Move(node);
-        if (_lastPositions.Count >= 40)
-            _lastPositions.Dequeue();
-        _lastPositions.Enqueue(node.transform.position);
-
-        if (!CheckIfMoved(FindAveragePosition(), node.transform.position))
+        if (_lastPositions.Count >= 20)
         {
-            //if (node.debug_node == true)
-                //Debug.Log("Node " + node.name + " did not move");
-            NoMovementEvent(node);
+            if (!CheckIfMoved(FindAveragePosition(), node.transform.position))
+            {
+                //if (node.debug_node == true)
+                    //Debug.Log("Node " + node.name + " did not move");
+                NoMovementEvent(node);
+            }
+            _lastPositions.Clear();
         }
-            
+        _lastPositions.Enqueue(node.transform.position);
     }
 
     private Vector2 FindAveragePosition()
@@ -83,10 +83,13 @@ public class Movement : MonoBehaviour
     public void SetTarget(Transform new_target)
     {
         Path.Add(_attached_node.transform.position);
-        if (new_target == null)
-            //Debug.Log("Setting target to null in node: " + _attached_node.name);
+        /*if (new_target == null)
+            Debug.Log("Setting target to null in node: " + _attached_node.name);*/
         if (_target != null)
+        {
             Last_Target_Pos = _target.position;
+        }
+            
         _target = new_target;
     }
 
@@ -220,6 +223,12 @@ public class Movement : MonoBehaviour
         _moveStrat.HandleNoMovement(node);
     }
 
+    public void NoSwarmMovementEvent(Node node, Transform newTarget)
+    {
+        Debug.Log("No swarm movement in node " + node.name + " moving towards " + newTarget.name);
+        _moveStrat.HandleNoSwarmMovement(node,newTarget);
+    }
+
     public void LostNodeDroppedEvent(Node node)
     {
         _moveStrat.HandleLostNodeDropped(node);
@@ -252,5 +261,15 @@ public class Movement : MonoBehaviour
                             ReferenceLoopHandling = ReferenceLoopHandling.Ignore
                         }));
         _moveStrat.HandleLostNodeDropped(_attached_node);  
+    }
+
+    public void SetWaitingForLostNode(bool value)
+    {
+        _waitingForLostNode = value;
+    }
+
+    public bool GetWaitingForLostNode()
+    {
+        return _waitingForLostNode;
     }
 }

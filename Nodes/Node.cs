@@ -216,6 +216,21 @@ public class Node : MonoBehaviour
         _movement.NewTargetEvent(this);
     }
 
+    public void RaiseNoSwarmMovementEvent()
+    {
+        _com.BroadcastMsg(this, MsgTypes.SwarmStuckMsg, JsonConvert.SerializeObject(_movement.GetTarget().name, Formatting.None,
+                        new JsonSerializerSettings()
+                        { 
+                            ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                        }));
+    }
+
+    public void NoSwarmMovementMsgHandler(int sender_id, string value)
+    {
+        Transform newTarget = GameObject.Find(JsonConvert.DeserializeObject<string>(value)).transform;
+        _movement.NoSwarmMovementEvent(this,newTarget);
+    }
+
     public void SetTargetMsgHandler(int sender_id, string value)
     {
         Transform target = GameObject.Find(JsonConvert.DeserializeObject<string>(value)).transform;

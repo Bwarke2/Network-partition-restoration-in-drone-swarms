@@ -123,7 +123,7 @@ public class Communication : MonoBehaviour
         //Debug.Log("Broadcasting to " + _swarm.GetMembers().Count + " nodes");
         foreach (Node node in _swarm.GetMembers())
         {
-            //Debug.Log("Recieved broadcast in node: " + node.ID);
+            //Debug.Log("Sendt broadcast to node: " + node.ID);
             if (node.ID != sender_node.ID)
             {
                 _num_sent_msgs++;
@@ -172,6 +172,9 @@ public class Communication : MonoBehaviour
             case MsgTypes.LostNodeDroppedMsg:
                 Recieving_node.LostNodeDroppedMsgHandler(sender_id, value);
                 break;  
+            case MsgTypes.SwarmStuckMsg:
+                Recieving_node.NoSwarmMovementMsgHandler(sender_id, value);
+                break;
         }
     }
 
