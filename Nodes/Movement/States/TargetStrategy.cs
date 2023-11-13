@@ -59,7 +59,6 @@ public class TargetStrategy : IMovementStrategy
     {
         Debug.Log("No swarm movement in node " + node.name + " moving towards " + newTarget.name);
         _movement.SetTarget(newTarget);
-        _movement.SetStrategy(new NoTargetStrategy());
     }
 
     public void Move(Node node)

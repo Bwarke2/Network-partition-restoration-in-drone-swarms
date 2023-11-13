@@ -65,6 +65,19 @@ public class Swarm : MonoBehaviour
             UIControl.DisplayDistance(TotalDistance);
             NumSentMsgs = CalTotalSentMsgs();
             UIControl.DisplayNumSentMsgs(NumSentMsgs);
+
+            if (timer.GetTimer() > 600)
+            {
+                timer.StopTimer();
+                Debug.Log("Time limit reached");
+                _simmulationRunning = false;
+
+                //Save results to file
+                SaveResults();
+
+                //Restart scene
+                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            }
         }
     }
 
@@ -141,18 +154,6 @@ public class Swarm : MonoBehaviour
         {
             timer.StopTimer();
             Debug.Log("All targets reached");
-            _simmulationRunning = false;
-
-            //Save results to file
-            SaveResults();
-
-            //Restart scene
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-        }
-        else if (timer.GetTimer() > 600)
-        {
-            timer.StopTimer();
-            Debug.Log("Time limit reached");
             _simmulationRunning = false;
 
             //Save results to file

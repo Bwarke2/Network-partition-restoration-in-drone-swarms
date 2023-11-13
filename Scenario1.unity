@@ -3360,7 +3360,7 @@ MonoBehaviour:
   TotalDistance: 0
   NumSentMsgs: 0
   Leader: {fileID: 0}
-  CurrentPartitionPolicy: 0
+  CurrentPartitionPolicy: 1
   UIControl: {fileID: 0}
 --- !u!4 &1139561392
 Transform:

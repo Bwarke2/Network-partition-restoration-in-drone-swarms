@@ -16,6 +16,7 @@ public class Movement : MonoBehaviour
     private Node _attached_node;
     public const float Safe = 1;   //Safe distance from other nodes
     private bool _waitingForLostNode = false;
+    private int _waitTime = 30;
 
     public void Setup(Swarm swarm, Communication com, Node node, IMovementStrategy moveStrat)
     {
@@ -25,6 +26,15 @@ public class Movement : MonoBehaviour
         Path.Add(node.transform.position);
         Last_Target_Pos = node.transform.position;
         SetStrategy(moveStrat);
+        switch (_swarm.CurrentPartitionPolicy)
+        {
+            case PartitionPolicy.PRP1:
+                _waitTime = 1;
+                break;
+            default:
+                _waitTime = 60;
+                break;
+        }
     }
 
     public void Move(Node node)
@@ -170,9 +180,12 @@ public class Movement : MonoBehaviour
 
     private void CheckIfPartitionIsRestored(Node in_node)
     {
-        if (_swarm.GetMembers().Count >= _com.GetNSN())
+        if (_moveStrat is ILostNodePRP || _moveStrat is SwarmPRP)
         {
-            PartitionRestoredEvent(in_node);
+            if (_swarm.GetMembers().Count >= _com.GetNSN())
+            {
+                PartitionRestoredEvent(in_node);
+            }
         }
     }
 
@@ -250,8 +263,10 @@ public class Movement : MonoBehaviour
     IEnumerator WaitForLostNode()
     {
         _waitingForLostNode = true;
-        yield return new WaitForSeconds(10);
+        Debug.Log("Waiting for lost node");
+        yield return new WaitForSeconds(_waitTime);
         Debug.Log("Done waiting for lost node");
+        _waitingForLostNode = false;
         int numOfMembers = _swarm.GetMembers().Count;
         _swarm.AddDroppedNode();
         _com.SetNSN(numOfMembers);

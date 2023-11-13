@@ -5,6 +5,7 @@ using UnityEngine;
 public class SwarmPRP : IMovementStrategy
 {
     private Movement _movement;
+    private bool _waitingForLostNode = false;
     public void SetMovement(Movement movement)
     {
         _movement = movement;
@@ -18,15 +19,15 @@ public class SwarmPRP : IMovementStrategy
         if (node.RP == null)
             return;
 
-        if (Vector2.Distance(node.transform.position, node.RP) < 3f)
+        if (Vector2.Distance(node.transform.position, node.RP) < 3.5f)
         {
-            _movement.SetWaitingForLostNode(true);
-            if ((node.ID == node.GetLeaderID()) && (_movement.GetWaitingForLostNode() == false))
+            if ((node.ID == node.GetLeaderID()) && (_waitingForLostNode == false))
             {
-                
-                Debug.Log("Waiting for lost node");
+                Debug.Log("Leader Waiting for lost node");
                 _movement.RPReachedByLeaderEvent();
             }
+            _movement.SetWaitingForLostNode(true);
+            _waitingForLostNode = true;
             //Dont move if within range of RP
             return;
         }

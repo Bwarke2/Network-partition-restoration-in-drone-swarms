@@ -9,9 +9,13 @@ public class UIControl : MonoBehaviour
     public Text timeText;
     public Text distText;
     public Text N_msg_Text;
+
+    private int _targetFPS = 30;
     // Start is called before the first frame update
     void Start()
     {
+        QualitySettings.vSyncCount = 0;
+        Application.targetFrameRate = _targetFPS;
         swarm = GameObject.FindGameObjectWithTag("Swarm").GetComponent<Swarm>();
     }
 

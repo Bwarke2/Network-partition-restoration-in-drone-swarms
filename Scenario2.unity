@@ -1816,7 +1816,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Path: []
   Last_Target_Pos: {x: 0, y: 0}
-  _waitingForLostNode: 0
 --- !u!114 &793120797
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2751,7 +2750,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Path: []
   Last_Target_Pos: {x: 0, y: 0}
-  _waitingForLostNode: 0
 --- !u!114 &1092041646
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2992,7 +2990,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Path: []
   Last_Target_Pos: {x: 0, y: 0}
-  _waitingForLostNode: 0
 --- !u!114 &1115311796
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3849,7 +3846,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Path: []
   Last_Target_Pos: {x: 0, y: 0}
-  _waitingForLostNode: 0
 --- !u!114 &1438318091
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4090,7 +4086,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Path: []
   Last_Target_Pos: {x: 0, y: 0}
-  _waitingForLostNode: 0
 --- !u!114 &1440530480
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4663,13 +4658,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1683612725}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: 0.40107277, w: 0.9160462}
-  m_LocalPosition: {x: 6.8, y: -8.3, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: 0.54856193, w: 0.8361099}
+  m_LocalPosition: {x: 5.52, y: -9.66, z: 0}
   m_LocalScale: {x: 2.2693, y: 4.5882, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 117174440}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 47.29}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 66.537}
 --- !u!70 &1683612727
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -5073,7 +5068,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Path: []
   Last_Target_Pos: {x: 0, y: 0}
-  _waitingForLostNode: 0
 --- !u!114 &1818672351
 MonoBehaviour:
   m_ObjectHideFlags: 0

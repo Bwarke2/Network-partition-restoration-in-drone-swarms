@@ -218,6 +218,11 @@ public class Node : MonoBehaviour
 
     public void RaiseNoSwarmMovementEvent()
     {
+        if (_movement.GetTarget() == null)
+        {
+            Debug.Log("No target for leader");
+            return;
+        }
         _com.BroadcastMsg(this, MsgTypes.SwarmStuckMsg, JsonConvert.SerializeObject(_movement.GetTarget().name, Formatting.None,
                         new JsonSerializerSettings()
                         { 
