@@ -79,7 +79,7 @@ public class SwarmPRP : IMovementStrategy
 
     public void HandleNoMovement(Node node)
     {
-        if(_movement.GetWaitingForLostNode() == false)
-            Debug.Log("Failed to reach RP");
+        //if(_movement.GetWaitingForLostNode() == false)
+            //Debug.Log("Failed to reach RP");
     }
 }

@@ -132,6 +132,11 @@ public class Swarm : MonoBehaviour
     public void TargetReached(GameObject target)
     {
         RemainingTargets.Remove(target);
+        if (RemainingTargets.Count > 0)
+        {
+            return;
+        }
+
         if (RemainingTargets.Count == 0)
         {
             timer.StopTimer();
@@ -144,21 +149,34 @@ public class Swarm : MonoBehaviour
             //Restart scene
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
+        else if (timer.GetTimer() > 600)
+        {
+            timer.StopTimer();
+            Debug.Log("Time limit reached");
+            _simmulationRunning = false;
+
+            //Save results to file
+            SaveResults();
+
+            //Restart scene
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        }
     }
 
     private void SaveResults()
     {
-        string path = "Assets/Results/test.txt";
+        string path = "Assets/Results/";
+        path += SceneManager.GetActiveScene().name;
         switch (CurrentPartitionPolicy)
         {
             case PartitionPolicy.PRP1:
-                path = "Assets/Results/PRP1.txt";
+                path += "/PRP1.txt";
                 break;
             case PartitionPolicy.PRP2:
-                path = "Assets/Results/PRP2.txt";
+                path += "/PRP2.txt";
                 break;
             case PartitionPolicy.PRP3:
-                path = "Assets/Results/PRP3.txt";
+                path += "/PRP3.txt";
                 break;
             default:
                 break;
