@@ -183,7 +183,10 @@ public class Swarm : MonoBehaviour
                 break;
         }
         StreamWriter writer = new StreamWriter(path, true);
-        writer.WriteLine(timer.GetTimer() + ";" + NumSentMsgs + ";" + TotalDistance + ";" + (swarm.Count - GetMembers().Count));
+        int nodes_lost = swarm.Count - GetMembers().Count;
+        if (timer.GetTimer() > 600)
+            nodes_lost = swarm.Count;
+        writer.WriteLine(timer.GetTimer() + ";" + NumSentMsgs + ";" + TotalDistance + ";" + nodes_lost);
         writer.Close();
     }
 
