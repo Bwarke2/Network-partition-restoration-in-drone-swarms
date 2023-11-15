@@ -61,11 +61,7 @@ public class LeaderElection
         {
             //Change this later to send messages instead of changing variables
             //Debug.Log("Broadcasting winner to: " + node.name);
-            _com.SendMsg(node, MsgTypes.Broadcast_WinnerMsg, node.ID, JsonConvert.SerializeObject(L_id, Formatting.None,
-                        new JsonSerializerSettings()
-                        { 
-                            ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-                        }));
+            _com.SendMsg<int>(node, MsgTypes.Broadcast_WinnerMsg, node.ID, L_id);
             //Debug.Log("Node " + ID + " broadcasting winner: " + L_id + " with term: " + Term);
         }
     }

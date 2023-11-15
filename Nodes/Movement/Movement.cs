@@ -113,10 +113,10 @@ public class Movement : MonoBehaviour
         //Check if target reached
         if (Vector2.Distance(_attached_node.transform.position, _target.position) < 0.001f)
         {
-            string value = JsonConvert.SerializeObject(_target.gameObject.name);
+            string value = _target.gameObject.name;
             SetTarget(null);
             TargetReachedEvent(_attached_node);
-            _com.SendMsg(_attached_node, MsgTypes.TargetReachedMsg, _attached_node.GetLeaderID(), value);
+            _com.SendMsg<string>(_attached_node, MsgTypes.TargetReachedMsg, _attached_node.GetLeaderID(), value);
             return true;
         }
         return false;
@@ -270,11 +270,7 @@ public class Movement : MonoBehaviour
         int numOfMembers = _swarm.GetMembers().Count;
         _swarm.AddDroppedNode();
         _com.SetNSN(numOfMembers);
-        _com.BroadcastMsg(this._attached_node, MsgTypes.LostNodeDroppedMsg, JsonConvert.SerializeObject(numOfMembers, Formatting.None,
-                        new JsonSerializerSettings()
-                        { 
-                            ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-                        }));
+        _com.BroadcastMsg<int>(this._attached_node, MsgTypes.LostNodeDroppedMsg, numOfMembers);
         _moveStrat.HandleLostNodeDropped(_attached_node);  
     }
 

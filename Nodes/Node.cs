@@ -120,11 +120,7 @@ public class Node : MonoBehaviour
             if (node.ID != ID)
             {
                 //Debug.Log("Sending roll call to: " + node.ID);
-                _com.SendMsg(this, MsgTypes.RollCallMsg, node.ID, JsonConvert.SerializeObject(ID, Formatting.None,
-                        new JsonSerializerSettings()
-                        { 
-                            ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-                        }));
+                _com.SendMsg<int>(this, MsgTypes.RollCallMsg, node.ID, ID);
             }
         }
     }
@@ -167,11 +163,7 @@ public class Node : MonoBehaviour
         foreach (Node node in _swarm.GetMembers())
         {
             //Change this later to send messages instead of changing variables
-            _com.SendMsg(this, MsgTypes.SetRPMsg, node.ID, JsonConvert.SerializeObject(RP, Formatting.None,
-                        new JsonSerializerSettings()
-                        { 
-                            ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-                        }));
+            _com.SendMsg<Vector2>(this, MsgTypes.SetRPMsg, node.ID, RP);
         }
     }
 
@@ -205,7 +197,7 @@ public class Node : MonoBehaviour
         {
             //Change this later to send messages instead of changing variables
             if (node.ID == node_id)
-                _com.SendMsg(this, MsgTypes.SetTargetMsg, node.ID, JsonUtility.ToJson(target));
+                _com.SendMsg<Transform>(this, MsgTypes.SetTargetMsg, node.ID, target);
         }
     }
 
@@ -223,11 +215,7 @@ public class Node : MonoBehaviour
             Debug.Log("No target for leader");
             return;
         }
-        _com.BroadcastMsg(this, MsgTypes.SwarmStuckMsg, JsonConvert.SerializeObject(_movement.GetTarget().name, Formatting.None,
-                        new JsonSerializerSettings()
-                        { 
-                            ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-                        }));
+        _com.BroadcastMsg<string>(this, MsgTypes.SwarmStuckMsg, _movement.GetTarget().name);
     }
 
     public void NoSwarmMovementMsgHandler(int sender_id, string value)

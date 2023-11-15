@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Newtonsoft.Json;
 
 public class Communication : MonoBehaviour
 {
@@ -103,23 +104,33 @@ public class Communication : MonoBehaviour
         return ConnnectingNeighbor;
     }
 
-    public void SendMsg(Node sender_node, MsgTypes msg_type, int recv_id, string value)
+    public void SendMsg<T>(Node sender_node, MsgTypes msg_type, int recv_id, T value)
     {
+        string value_to_send = JsonConvert.SerializeObject(value, Formatting.None,
+                        new JsonSerializerSettings()
+                        { 
+                            ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                        });
         foreach (Node node in _swarm.GetMembers())
         {
             //Debug.Log("Checking node: " + node.ID);
             if (node.ID == recv_id)
             {
                 _num_sent_msgs++;
-                ReceiveMsg(node, msg_type, sender_node.ID, value);
+                ReceiveMsg(node, msg_type, sender_node.ID, value_to_send);
                 return;
             }
         }
         Debug.Log("No reciever mached id: " + recv_id);
     }
 
-    public void BroadcastMsg(Node sender_node, MsgTypes msg_type, string value)
+    public void BroadcastMsg<T>(Node sender_node, MsgTypes msg_type, T value)
     {
+        string value_to_send = JsonConvert.SerializeObject(value, Formatting.None,
+                        new JsonSerializerSettings()
+                        { 
+                            ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                        });
         //Debug.Log("Broadcasting to " + _swarm.GetMembers().Count + " nodes");
         foreach (Node node in _swarm.GetMembers())
         {
@@ -127,7 +138,7 @@ public class Communication : MonoBehaviour
             if (node.ID != sender_node.ID)
             {
                 _num_sent_msgs++;
-                ReceiveMsg(node, msg_type, sender_node.ID, value);
+                ReceiveMsg(node, msg_type, sender_node.ID, value_to_send);
             }
         }
     }

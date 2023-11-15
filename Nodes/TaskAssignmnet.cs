@@ -65,11 +65,7 @@ public class TaskAssignmnet
         }
         
         //Send distance to sender
-        _com.SendMsg(RecieverNode, MsgTypes.ReturnBitMsg, sender_id, JsonConvert.SerializeObject(distance, Formatting.None,
-                new JsonSerializerSettings()
-                { 
-                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-                }));
+        _com.SendMsg<float>(RecieverNode, MsgTypes.ReturnBitMsg, sender_id, distance);
     }
 
     public void AssignTasks(Node Auctioneer, List<Node> Nodes_to_assign)
@@ -107,20 +103,6 @@ public class TaskAssignmnet
                 resheduledTasks.Add(PT);
             }
         }
-        /* Added to remove continued prioritation of resheduled tasks
-        foreach (Pursuing_Targets_struct PT in resheduledTasks)
-        {
-            int ct_start = currentTasks.Count;
-            if (!currentTasks.Remove(PT))
-                Debug.Log("Failed to remove task");
-            Pursuing_Targets_struct updatedTarget = new Pursuing_Targets_struct();
-            updatedTarget.target = PT.target;
-            updatedTarget.assign_time = Time.time;
-            currentTasks.Add(updatedTarget);
-            int ct_end = currentTasks.Count;
-            if (ct_start != ct_end)
-                Debug.Log("Failed to update current task");
-        }*/
         //Debug.Log("Resheduled tasks: " + resheduledTasks.Count);
         tasks.AddRange(unsheduledTasks);
         //Debug.Log("Total tasks: " + tasks.Count);
@@ -146,11 +128,7 @@ public class TaskAssignmnet
         // Send auction message to neighbours
         foreach (Node node in Nodes_to_assign)
         {
-            _com.SendMsg(Auctioneer, MsgTypes.AnounceAuctionMsg, node.ID, JsonConvert.SerializeObject(target.name, Formatting.None,
-                        new JsonSerializerSettings()
-                        { 
-                            ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-                        }));
+            _com.SendMsg<string>(Auctioneer, MsgTypes.AnounceAuctionMsg, node.ID, target.name);
         }
         
         ConcludeAuction(Auctioneer,target,Nodes_to_assign);
@@ -202,11 +180,7 @@ public class TaskAssignmnet
         {
             //Change this later to send messages instead of changing variables
             if (node.ID == min_bid_id)
-                _com.SendMsg(Auctioneer, MsgTypes.SetTargetMsg, node.ID, JsonConvert.SerializeObject(target.name, Formatting.None,
-                        new JsonSerializerSettings()
-                        { 
-                            ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-                        }));
+                _com.SendMsg<string>(Auctioneer, MsgTypes.SetTargetMsg, node.ID, target.name);
         }
 
         
