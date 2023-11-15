@@ -56,7 +56,7 @@ public class TooCloseStrategy : IMovementStrategy
         IMovementStrategy newStrat;
         if (com.ConnectedToLeader == false)
         {
-            switch (swarm.CurrentPartitionPolicy)
+            switch (swarm.GetPartitionPolicy())
             {
                 case PartitionPolicy.PRP1:
                     newStrat = new LostNodePRP1();

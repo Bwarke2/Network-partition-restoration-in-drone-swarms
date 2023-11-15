@@ -29,6 +29,7 @@ public class TaskAssignmnet
             return Vector2.Distance(a.position, swarm.FindCenterPositionOfSwarm()).CompareTo(Vector2.Distance(b.position, swarm.FindCenterPositionOfSwarm()));
         });
     }
+    
 
     public bool RemovePursuingTarget(Transform target)
     {

@@ -47,12 +47,12 @@ public class Node : MonoBehaviour
         _com = GetComponent<Communication>();
         _leaderElection.Startup(_com);
         _movement = GetComponent<Movement>();
-        _movement.Setup(_swarm,_com, this, new NoTargetStrategy());
-        _TaskAssignment.Setup();
+        _movement.Setup(_swarm);
     }
 
     void Start()
     {
+        _TaskAssignment.Setup();
         _com.UpdateNeighbours();
         if (name == "Node_leader")
         {
@@ -65,7 +65,7 @@ public class Node : MonoBehaviour
             SendNewRP();
             StartCoroutine(UpdateRP());
             StartCoroutine(TaskAssignment());
-            _TaskAssignment.AssignTasks(this, _swarm.GetMembers());
+            //_TaskAssignment.AssignTasks(this, _swarm.GetMembers());
         }
     }
 
@@ -103,6 +103,7 @@ public class Node : MonoBehaviour
     {
         while (true)
         {
+            yield return null;
             _TaskAssignment.AssignTasks(this, _swarm.GetMembers());
             yield return new WaitForSeconds(10);
         }
@@ -167,7 +168,7 @@ public class Node : MonoBehaviour
     private void ChooseRP()
     {
         //Choose RP
-        switch (_swarm.CurrentPartitionPolicy)
+        switch (_swarm.GetPartitionPolicy())
         {
             case PartitionPolicy.PRP1:
                 RP = _movement.Path.Last();

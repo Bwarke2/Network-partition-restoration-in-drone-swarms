@@ -7,26 +7,23 @@ public class Movement : MonoBehaviour
 {
     private IMovementStrategy _moveStrat = new NoTargetStrategy();
     private Swarm _swarm;
-    private Communication _com;
+    [SerializeField]
     private Transform _target;
 
     public List<Vector2> Path = new List<Vector2>();
     private Queue<Vector2> _lastPositions = new Queue<Vector2>();
     public Vector2 Last_Target_Pos;
-    private Node _attached_node;
     public const float Safe = 1;   //Safe distance from other nodes
     private bool _waitingForLostNode = false;
     private int _waitTime = 30;
 
-    public void Setup(Swarm swarm, Communication com, Node node, IMovementStrategy moveStrat)
+    public void Setup(Swarm swarm)
     {
         _swarm = swarm;
-        _com = com;
-        _attached_node = node;
-        Path.Add(node.transform.position);
-        Last_Target_Pos = node.transform.position;
-        SetStrategy(moveStrat);
-        switch (_swarm.CurrentPartitionPolicy)
+        Path.Add(transform.position);
+        Last_Target_Pos = transform.position;
+        SetStrategy(new NoTargetStrategy());
+        switch (_swarm.GetPartitionPolicy())
         {
             case PartitionPolicy.PRP1:
                 _waitTime = 1;
@@ -67,7 +64,7 @@ public class Movement : MonoBehaviour
     private bool CheckIfMoved(Vector2 averagePos, Vector2 currentPos)
     {
         float dist = Vector2.Distance(averagePos, currentPos);
-        //if (_attached_node.debug_node == true)
+        //if (GetComponent<Node>().debug_node == true)
             //Debug.Log("Distance moved: " + dist);
         if (dist < 0.005)
         {
@@ -75,14 +72,13 @@ public class Movement : MonoBehaviour
             return false;
         }
             
-
         return true;
     }
 
     public void SetStrategy(IMovementStrategy moveStrat)
     {
-        if (_attached_node.debug_node == true)
-            Debug.Log("Node " + _attached_node.name +" Setting strategy to: " + moveStrat.GetType().Name);
+        if (GetComponent<Node>().debug_node == true)
+            Debug.Log("Node " + GetComponent<Node>().name +" Setting strategy to: " + moveStrat.GetType().Name);
         if (_moveStrat != moveStrat)
         {
             _moveStrat = moveStrat;
@@ -92,9 +88,9 @@ public class Movement : MonoBehaviour
 
     public void SetTarget(Transform new_target)
     {
-        Path.Add(_attached_node.transform.position);
+        Path.Add(GetComponent<Node>().transform.position);
         /*if (new_target == null)
-            Debug.Log("Setting target to null in node: " + _attached_node.name);*/
+            Debug.Log("Setting target to null in node: " + GetComponent<Node>().name);*/
         if (_target != null)
         {
             Last_Target_Pos = _target.position;
@@ -111,12 +107,12 @@ public class Movement : MonoBehaviour
     public bool TargetReached()
     {
         //Check if target reached
-        if (Vector2.Distance(_attached_node.transform.position, _target.position) < 0.001f)
+        if (Vector2.Distance(GetComponent<Node>().transform.position, _target.position) < 0.001f)
         {
             string value = _target.gameObject.name;
             SetTarget(null);
-            TargetReachedEvent(_attached_node);
-            _com.SendMsg<string>(_attached_node, MsgTypes.TargetReachedMsg, _attached_node.GetLeaderID(), value);
+            TargetReachedEvent(GetComponent<Node>());
+            GetComponent<Communication>().SendMsg<string>(GetComponent<Node>(), MsgTypes.TargetReachedMsg, GetComponent<Node>().GetLeaderID(), value);
             return true;
         }
         return false;
@@ -130,7 +126,7 @@ public class Movement : MonoBehaviour
     public void DecideMoveStrat(Node in_node)
     {
         //Check if partition has happened
-        if (_swarm.GetMembers().Count < _com.GetNSN())
+        if (_swarm.GetMembers().Count < GetComponent<Communication>().GetNSN())
         {
             LostNodeEvent(in_node);
             return;
@@ -143,11 +139,11 @@ public class Movement : MonoBehaviour
         float F_obj = in_node.FindFobj();
         if (F_obj < 1)
         {
-            TooFarEvent(in_node, _com.GetConnectingNeighbor());
+            TooFarEvent(in_node, GetComponent<Communication>().GetConnectingNeighbor());
             return;
         }
         //Check if too close to neighbour
-        CheckIfToClose(in_node, _com.GetNeighbours());
+        CheckIfToClose(in_node, GetComponent<Communication>().GetNeighbours());
 
         //Check if target is null
         if (_target == null)
@@ -182,7 +178,7 @@ public class Movement : MonoBehaviour
     {
         if (_moveStrat is ILostNodePRP || _moveStrat is SwarmPRP)
         {
-            if (_swarm.GetMembers().Count >= _com.GetNSN())
+            if (_swarm.GetMembers().Count >= GetComponent<Communication>().GetNSN())
             {
                 PartitionRestoredEvent(in_node);
             }
@@ -191,7 +187,7 @@ public class Movement : MonoBehaviour
 
     public void LostNodeEvent(Node node)
     {
-        _moveStrat.HandleLostNode(node, _com, this, _swarm);
+        _moveStrat.HandleLostNode(node, GetComponent<Communication>(), this, _swarm);
     }
 
     public void PartitionRestoredEvent(Node node)
@@ -201,7 +197,7 @@ public class Movement : MonoBehaviour
             StopCoroutine(WaitForLostNode());
             _waitingForLostNode = false;
         }
-        _com.SetNSN(_swarm.GetMembers().Count);
+        GetComponent<Communication>().SetNSN(_swarm.GetMembers().Count);
         _moveStrat.HandlePartitionRestored(node);
     }
 
@@ -250,9 +246,9 @@ public class Movement : MonoBehaviour
     public void LostNodeDroppedMsgHandler(int sender_id, string value)
     {
         int num_of_members = JsonConvert.DeserializeObject<int>(value);
-        Debug.Log("Lost node dropped in node: " + _attached_node.name + ", new NSN: " + num_of_members);
-        _com.SetNSN(num_of_members);
-        _moveStrat.HandleLostNodeDropped(_attached_node);   
+        Debug.Log("Lost node dropped in node: " + GetComponent<Node>().name + ", new NSN: " + num_of_members);
+        GetComponent<Communication>().SetNSN(num_of_members);
+        _moveStrat.HandleLostNodeDropped(GetComponent<Node>());   
     }
 
     public void RPReachedByLeaderEvent()
@@ -269,9 +265,9 @@ public class Movement : MonoBehaviour
         _waitingForLostNode = false;
         int numOfMembers = _swarm.GetMembers().Count;
         _swarm.AddDroppedNode();
-        _com.SetNSN(numOfMembers);
-        _com.BroadcastMsg<int>(this._attached_node, MsgTypes.LostNodeDroppedMsg, numOfMembers);
-        _moveStrat.HandleLostNodeDropped(_attached_node);  
+        GetComponent<Communication>().SetNSN(numOfMembers);
+        GetComponent<Communication>().BroadcastMsg<int>(this.GetComponent<Node>(), MsgTypes.LostNodeDroppedMsg, numOfMembers);
+        _moveStrat.HandleLostNodeDropped(GetComponent<Node>());  
     }
 
     public void SetWaitingForLostNode(bool value)

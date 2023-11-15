@@ -31,7 +31,8 @@ public class Swarm : MonoBehaviour
 
     public Node Leader;
 
-    public PartitionPolicy CurrentPartitionPolicy = PartitionPolicy.PRP1;
+    [SerializeField]
+    private PartitionPolicy CurrentPartitionPolicy = PartitionPolicy.PRP1;
 
     //UI
     public UIControl UIControl = null;
@@ -220,6 +221,11 @@ public class Swarm : MonoBehaviour
     public List<GameObject> GetTargets()
     {
         return RemainingTargets;
+    }
+
+    public PartitionPolicy GetPartitionPolicy()
+    {
+        return CurrentPartitionPolicy;
     }
 
     public void AddDroppedNode()
