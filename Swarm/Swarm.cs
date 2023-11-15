@@ -230,7 +230,7 @@ public class Swarm : MonoBehaviour
         Debug.Log("Dropped nodes: " + NumDroppedNodes);
     }
 
-    private Vector2 FindCenterPositionOfSwarm()
+    public Vector2 FindCenterPositionOfSwarm()
     {
         Vector2 center = Vector2.zero;
         foreach (Node node in GetMembers())

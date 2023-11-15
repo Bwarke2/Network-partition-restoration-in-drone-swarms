@@ -28,7 +28,6 @@ public class Node : MonoBehaviour
     private Swarm _swarm;    //Swarm object
 
     //Leader attributes
-    //public List<Transform> Unreached_Targets = new List<Transform>();         //Number of unreached targets
     private TaskAssignmnet _TaskAssignment = new TaskAssignmnet();
 
     private LeaderElection _leaderElection = new LeaderElection();
@@ -49,7 +48,7 @@ public class Node : MonoBehaviour
         _leaderElection.Startup(_com);
         _movement = GetComponent<Movement>();
         _movement.Setup(_swarm,_com, this, new NoTargetStrategy());
-        _TaskAssignment.Setup(_com,_movement);
+        _TaskAssignment.Setup();
     }
 
     void Start()
@@ -74,8 +73,6 @@ public class Node : MonoBehaviour
     void Update()
     {
         _com.UpdateNeighbours();
-        //Target assignment
-        //_TaskAssignment.AssignTasks(this, Unreached_Targets, _swarm.GetMembers());
     }
 
     void LateUpdate()

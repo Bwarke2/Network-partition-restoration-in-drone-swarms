@@ -11,19 +11,14 @@ public struct Pursuing_Targets_struct
 }
 public class TaskAssignmnet
 {
-    public List<Transform> Unreached_Targets = new List<Transform>();
-    public List<Pursuing_Targets_struct> Pursuing_Targets = new List<Pursuing_Targets_struct>();
-    public Dictionary<int, float> Bids = new Dictionary<int, float>();
-    private Communication _com = null;
-    private Movement _movement = null;
-    private Swarm _swarm = null;
+    private List<Transform> Unreached_Targets = new List<Transform>();
+    private List<Pursuing_Targets_struct> Pursuing_Targets = new List<Pursuing_Targets_struct>();
+    private Dictionary<int, float> Bids = new Dictionary<int, float>();
     
 
-    public void Setup(Communication com, Movement movement)
+    public void Setup()
     {
-        _com = com;
-        _movement = movement;
-        _swarm = GameObject.FindGameObjectWithTag("Swarm").GetComponent<Swarm>();
+        Swarm swarm = GameObject.FindGameObjectWithTag("Swarm").GetComponent<Swarm>();
 
         foreach (GameObject go in GameObject.FindGameObjectsWithTag("Target"))
             Unreached_Targets.Add(go.transform);
@@ -31,7 +26,7 @@ public class TaskAssignmnet
             //Sort targets based on distance to node start position
         Unreached_Targets.Sort(delegate (Transform a, Transform b)
         {
-            return Vector2.Distance(a.position, _com.transform.position).CompareTo(Vector2.Distance(b.position, _com.transform.position));
+            return Vector2.Distance(a.position, swarm.FindCenterPositionOfSwarm()).CompareTo(Vector2.Distance(b.position, swarm.FindCenterPositionOfSwarm()));
         });
     }
 
@@ -58,14 +53,14 @@ public class TaskAssignmnet
         Transform target_to_auction = GameObject.Find(JsonConvert.DeserializeObject<string>(value)).transform;
         //Find distance to target
         float distance = Vector2.Distance(RecieverNode.transform.position, target_to_auction.position);
-        if (_movement.GetTarget() != null)
+        if (RecieverNode.GetComponent<Movement>().GetTarget() != null)
         {
             //Debug.Log("Node: " + RecieverNode.name + " is already pursuing a target");
             return;
         }
         
         //Send distance to sender
-        _com.SendMsg<float>(RecieverNode, MsgTypes.ReturnBitMsg, sender_id, distance);
+        RecieverNode.GetComponent<Communication>().SendMsg<float>(RecieverNode, MsgTypes.ReturnBitMsg, sender_id, distance);
     }
 
     public void AssignTasks(Node Auctioneer, List<Node> Nodes_to_assign)
@@ -106,7 +101,7 @@ public class TaskAssignmnet
         //Debug.Log("Resheduled tasks: " + resheduledTasks.Count);
         tasks.AddRange(unsheduledTasks);
         //Debug.Log("Total tasks: " + tasks.Count);
-        int count = 0;
+        /*int count = 0;
         foreach (Transform task in tasks)
         {
             count++;
@@ -116,7 +111,7 @@ public class TaskAssignmnet
 
         if(tasks.Count > _swarm.RemainingTargets.Count)
             Debug.Log("More tasks (" + tasks.Count+ ") than targets: " + _swarm.RemainingTargets.Count);
-
+        */
         return tasks;
         
     }
@@ -128,7 +123,7 @@ public class TaskAssignmnet
         // Send auction message to neighbours
         foreach (Node node in Nodes_to_assign)
         {
-            _com.SendMsg<string>(Auctioneer, MsgTypes.AnounceAuctionMsg, node.ID, target.name);
+            Auctioneer.GetComponent<Communication>().SendMsg<string>(Auctioneer, MsgTypes.AnounceAuctionMsg, node.ID, target.name);
         }
         
         ConcludeAuction(Auctioneer,target,Nodes_to_assign);
@@ -160,7 +155,6 @@ public class TaskAssignmnet
         {
             if (PT.target == target)
             {
-                //Debug.Log("Target already assigned");
                 target_already_assigned = true;
             }
         }
@@ -174,16 +168,7 @@ public class TaskAssignmnet
                 Debug.Log("Failed to remove target from unreached list: " + target.name);
         }
         
-
-        // Send task to winner
-        foreach (Node node in Nodes_to_assign)
-        {
-            //Change this later to send messages instead of changing variables
-            if (node.ID == min_bid_id)
-                _com.SendMsg<string>(Auctioneer, MsgTypes.SetTargetMsg, node.ID, target.name);
-        }
-
-        
+        Auctioneer.GetComponent<Communication>().SendMsg<string>(Auctioneer, MsgTypes.SetTargetMsg, min_bid_id, target.name);
     }
 }
 
