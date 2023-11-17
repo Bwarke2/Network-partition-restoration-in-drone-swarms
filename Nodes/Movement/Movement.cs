@@ -36,7 +36,9 @@ public class Movement : MonoBehaviour
 
     public void Move(Node node)
     {
-        _moveStrat.Move(node);
+        Vector3 desiredPos = _moveStrat.GetDesiredPosition(node);
+        MoveNode.MoveToward(node, desiredPos);
+        CheckIfTargetReached();
         if (_lastPositions.Count >= 20)
         {
             if (!CheckIfMoved(FindAveragePosition(), node.transform.position))
@@ -104,10 +106,12 @@ public class Movement : MonoBehaviour
         return _target;
     }
 
-    public bool TargetReached()
+    public bool CheckIfTargetReached()
     {
-        //Check if target reached
-        if (Vector2.Distance(GetComponent<Node>().transform.position, _target.position) < 0.001f)
+        if ((_moveStrat is TargetStrategy) == false || _target == null)
+            return false;
+        float dist = Vector2.Distance(GetComponent<Node>().transform.position, _target.position);
+        if (dist < 0.001f)
         {
             string value = _target.gameObject.name;
             SetTarget(null);

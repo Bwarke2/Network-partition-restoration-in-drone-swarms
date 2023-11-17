@@ -30,11 +30,11 @@ public class TooCloseStrategy : IMovementStrategy
         }
         return closest;
     }
-    public void Move(Node node)
+    public Vector3 GetDesiredPosition(Node node)
     {
         //Debug.Log("Moving away from neighbor");
         if (Neighbors.Count == 0)
-            return;
+            return node.transform.position;
         Node closest = GetClosestNeighbor(node);
 
         float dist = Vector3.Distance(node.transform.position, closest.transform.position);
@@ -46,9 +46,8 @@ public class TooCloseStrategy : IMovementStrategy
         //Get direction away from closest
         Vector3 dir = node.transform.position - closest.transform.position;
         //dir = dir.normalized;
-        Vector3 desired_pos = node.transform.position + dir;
-        float step = IMovementStrategy._speed * Time.deltaTime;
-        node.transform.position = Vector2.MoveTowards(node.transform.position, desired_pos, step);
+        return node.transform.position + dir;
+        
     }
 
     public void HandleLostNode(Node node, Communication com, Movement movement, Swarm swarm)

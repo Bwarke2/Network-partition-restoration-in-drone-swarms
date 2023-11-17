@@ -4,7 +4,7 @@ using UnityEngine;
 
 public interface IMovementStrategy
 {
-    protected const float _speed = 1; //Movement speed
+    
     public void SetConnectingNode(Node node)
     {
     }
@@ -24,5 +24,5 @@ public interface IMovementStrategy
     public void HandleNoSwarmMovement(Node node, Transform newTarget){}
     virtual public void HandleLostNodeDropped(Node node){}
     virtual public void HandleNoMovement(Node node){}
-    virtual void Move(Node node){}
+    abstract public Vector3 GetDesiredPosition(Node node);
 }

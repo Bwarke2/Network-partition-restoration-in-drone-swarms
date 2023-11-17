@@ -33,7 +33,7 @@ public class Communication : MonoBehaviour
 
     void Update()
     {
-        FindConnectingNeighbor();
+        ConnnectingNeighbor = FindConnectingNeighbor();
         Hops = FindHopsToLeader();
     }
 
@@ -84,24 +84,25 @@ public class Communication : MonoBehaviour
     {
         float min_distance = float.MaxValue;
         int min_hop = int.MaxValue;
+        Node CN = null;
         foreach (GameObject node in NB)
         {
             if (node.GetComponent<Communication>().Hops < min_hop)
             {
                 min_hop = node.GetComponent<Communication>().Hops;
                 min_distance = Vector2.Distance(node.transform.position, transform.position);
-                ConnnectingNeighbor = node.GetComponent<Node>();
+                CN = node.GetComponent<Node>();
             }
             if (node.GetComponent<Communication>().Hops == min_hop)
             {
                 if (Vector2.Distance(node.transform.position, transform.position) < min_distance)
                 {
                     min_distance = Vector2.Distance(node.transform.position, transform.position);
-                    ConnnectingNeighbor = node.GetComponent<Node>();
+                    CN = node.GetComponent<Node>();
                 }  
             }
         }
-        return ConnnectingNeighbor;
+        return CN;
     }
 
     public void SendMsg<T>(Node sender_node, MsgTypes msg_type, int recv_id, T value)

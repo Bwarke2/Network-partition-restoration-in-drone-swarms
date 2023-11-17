@@ -60,9 +60,8 @@ public class NoTargetStrategy : IMovementStrategy
         _movement.SetStrategy(new TargetStrategy());
     }
 
-    public void Move(Node node)
+    public Vector3 GetDesiredPosition(Node node)
     {
-        //Debug.Log("No target");
-        //Do nothing
+        return node.transform.position;
     }
 }

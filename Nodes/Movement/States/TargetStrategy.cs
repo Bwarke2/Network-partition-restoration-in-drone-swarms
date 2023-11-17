@@ -61,19 +61,14 @@ public class TargetStrategy : IMovementStrategy
         _movement.SetTarget(newTarget);
     }
 
-    public void Move(Node node)
+    public Vector3 GetDesiredPosition(Node node)
     {
         //Debug.Log("Moving towards target");
         if (_movement.GetTarget() == null)
         {
             //Debug.Log("No target");
-            return;
+            return node.transform.position;
         }
-
-        float step = IMovementStrategy._speed * Time.deltaTime;
-        Vector2 desired_pos = _movement.GetTarget().position;
-        node.transform.position = Vector2.MoveTowards(node.transform.position, desired_pos, step);
-    
-        _movement.TargetReached();
+        return _movement.GetTarget().position;
     }
 }

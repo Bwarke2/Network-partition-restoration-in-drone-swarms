@@ -11,13 +11,13 @@ public class SwarmPRP : IMovementStrategy
         _movement = movement;
     }
 
-    public void Move(Node node)
+    public Vector3 GetDesiredPosition(Node node)
     {
         //Debug.Log("Swarm PRP");
         
         
         if (node.RP == null)
-            return;
+            return node.transform.position;
 
         if (Vector2.Distance(node.transform.position, node.RP) < 3.5f)
         {
@@ -29,13 +29,11 @@ public class SwarmPRP : IMovementStrategy
             _movement.SetWaitingForLostNode(true);
             _waitingForLostNode = true;
             //Dont move if within range of RP
-            return;
+            return node.transform.position;
         }
 
         //Move toward RP
-        float step = IMovementStrategy._speed * Time.deltaTime;
-        Vector2 desired_pos = node.RP;
-        node.transform.position = Vector2.MoveTowards(node.transform.position, desired_pos, step);
+        return node.RP;
     }
 
     public void HandleTooClose(Node node, List<Node> neighbors)

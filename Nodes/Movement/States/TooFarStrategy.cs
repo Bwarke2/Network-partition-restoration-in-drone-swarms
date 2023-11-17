@@ -16,19 +16,16 @@ public class TooFarStrategy : IMovementStrategy
     {
         connecting_node = node;
     }
-    public void Move(Node node)
+    public Vector3 GetDesiredPosition(Node node)
     {
         if (connecting_node == null)
-            return;
+            return node.transform.position;
         if (Vector2.Distance(node.transform.position, connecting_node.transform.position) < _safe_connecting_distance)
         {
             _movement.NormalRangeEvent(node);
-            return;
+            return node.transform.position;
         }
-        Vector3 desired_pos = connecting_node.transform.position;
-        float step = IMovementStrategy._speed * Time.deltaTime;
-        node.transform.position = Vector2.MoveTowards(node.transform.position, desired_pos, step);
-        //Debug.Log("Moving towards neighbor");
+        return connecting_node.transform.position;
     }
 
     public void HandleNormalRange(Node node)

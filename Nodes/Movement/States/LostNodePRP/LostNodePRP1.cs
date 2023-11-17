@@ -8,10 +8,9 @@ public class LostNodePRP1 : ILostNodePRP
     {
         _movement = movement;
     }
-    public void Move(Node node)
+    public Vector3 GetDesiredPosition(Node node)
     {
-        //Debug.Log("Lost node PRP 1");
-        //Do nothing
+        return node.transform.position;
     }
 
     public void HandleNormalRange(Node node)

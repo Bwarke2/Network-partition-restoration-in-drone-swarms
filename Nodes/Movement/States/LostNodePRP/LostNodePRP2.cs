@@ -8,17 +8,13 @@ public class LostNodePRP2 : ILostNodePRP
     {
         _movement = movement;
     }
-    public virtual void Move(Node node)
+    public virtual Vector3 GetDesiredPosition(Node node)
     {
         //Debug.Log("Lost node PRP 2");
         if (node.RP == null)
-            return;
+            return node.transform.position;
 
-        float step = IMovementStrategy._speed * Time.deltaTime;
-        Vector2 desired_pos = node.RP;
-        node.transform.position = Vector2.MoveTowards(node.transform.position, desired_pos, step);
-        
-        //Do nothing
+        return node.RP;
     }
 
     public void HandleNormalRange(Node node)
