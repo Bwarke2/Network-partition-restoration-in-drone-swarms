@@ -78,7 +78,7 @@ public class Node : MonoBehaviour
     void LateUpdate()
     {
         RecordDistance();
-        _movement.DecideMoveStrat(this);
+        _movement.CheckForMovementEvents(this);
         _movement.Move(this);
         NumSentMsgs = GetNumSentMsgs();
     }
@@ -280,7 +280,7 @@ public class Node : MonoBehaviour
         //Debug.Log("Recieved broadcast winner msg");
         _leaderElection.HandleBroadcastWinnerMsg(sender_id, value);
     }
-
+    
     public void LostNodeDroppedMsgHandler(int sender_id, string value)
     {
         //Debug.Log("Recieved lost node dropped msg");

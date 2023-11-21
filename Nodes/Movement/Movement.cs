@@ -127,7 +127,7 @@ public class Movement : MonoBehaviour
         return _moveStrat;
     }
 
-    public void DecideMoveStrat(Node in_node)
+    public void CheckForMovementEvents(Node in_node)
     {
         //Check if partition has happened
         if (_swarm.GetMembers().Count < GetComponent<Communication>().GetNSN())

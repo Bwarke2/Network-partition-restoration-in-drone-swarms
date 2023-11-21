@@ -187,7 +187,7 @@ public class Swarm : MonoBehaviour
         int nodes_lost = swarm.Count - GetMembers().Count;
         if (timer.GetTimer() > 600)
             nodes_lost = swarm.Count;
-        writer.WriteLine(timer.GetTimer() + ";" + NumSentMsgs + ";" + TotalDistance + ";" + nodes_lost);
+        writer.WriteLine(timer.GetTimer() + ";" + NumSentMsgs + ";" + TotalDistance + ";" + nodes_lost + ";" + RemainingTargets.Count);
         writer.Close();
     }
 

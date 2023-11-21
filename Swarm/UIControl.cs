@@ -24,7 +24,7 @@ public class UIControl : MonoBehaviour
     {
         foreach (Node node in swarm.JoinedNodes)
         {
-            node.gameObject.GetComponent<Renderer>().material.color = Color.green;
+            node.gameObject.GetComponent<Renderer>().material.color = Color.blue;
         }
 
         foreach (GameObject node in swarm.LostNodes)
@@ -32,7 +32,7 @@ public class UIControl : MonoBehaviour
             node.GetComponent<Renderer>().material.color = Color.black;
         }
 
-        swarm.Leader.gameObject.GetComponent<Renderer>().material.color = Color.red;
+        swarm.Leader.gameObject.GetComponent<Renderer>().material.color = Color.yellow;
     }
 
     public void DisplayTime(float timeToDisplay)
