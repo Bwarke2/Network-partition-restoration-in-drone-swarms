@@ -33,6 +33,8 @@ public class Communication : MonoBehaviour
 
     void Update()
     {
+        if (_swarm.Leader == null)
+            return;
         ConnnectingNeighbor = FindConnectingNeighbor();
         Hops = FindHopsToLeader();
     }
@@ -105,8 +107,9 @@ public class Communication : MonoBehaviour
         return CN;
     }
 
-    public void SendMsg<T>(Node sender_node, MsgTypes msg_type, int recv_id, T value)
+    public void SendMsg<T>(MsgTypes msg_type, int recv_id, T value)
     {
+        Node sender_node = GetComponent<Node>();
         string value_to_send = JsonConvert.SerializeObject(value, Formatting.None,
                         new JsonSerializerSettings()
                         { 
@@ -125,8 +128,9 @@ public class Communication : MonoBehaviour
         Debug.Log("No reciever mached id: " + recv_id);
     }
 
-    public void BroadcastMsg<T>(Node sender_node, MsgTypes msg_type, T value)
+    public void BroadcastMsg<T>(MsgTypes msg_type, T value)
     {
+        Node sender_node = GetComponent<Node>();
         string value_to_send = JsonConvert.SerializeObject(value, Formatting.None,
                         new JsonSerializerSettings()
                         { 
@@ -186,6 +190,12 @@ public class Communication : MonoBehaviour
                 break;  
             case MsgTypes.SwarmStuckMsg:
                 Recieving_node.NoSwarmMovementMsgHandler(sender_id, value);
+                break;
+            case MsgTypes.ElectionMsg:
+                Recieving_node.ElectionMsgHandler(sender_id, value);
+                break;
+            case MsgTypes.VoteMsg:
+                Recieving_node.VoteMsgHandler(sender_id, value);
                 break;
         }
     }

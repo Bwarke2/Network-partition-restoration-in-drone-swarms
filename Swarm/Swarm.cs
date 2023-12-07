@@ -24,6 +24,7 @@ public class Swarm : MonoBehaviour
 
     private bool _simmulationRunning = false;
     private Queue<Vector2> _lastPositions = new Queue<Vector2>();
+    private int Term = 0;
 
     //Metrics
     public float TotalDistance = 0;
@@ -60,7 +61,7 @@ public class Swarm : MonoBehaviour
     private PartitionPolicy ChoosePartitionPolicy()
     {
         // Find shortest file in folder
-        string path = "Assets/Results/";
+        string path = "Assets/Results_LE/";
         path += SceneManager.GetActiveScene().name;
         DirectoryInfo di = new DirectoryInfo(path);
         FileInfo[] files = di.GetFiles();
@@ -190,6 +191,24 @@ public class Swarm : MonoBehaviour
         return msgs;
     }
 
+    public void SetLeader(int l_id, int new_term)
+    {
+        //Debug.Log("New term is: " + new_term + "With leader: " + l_id);
+        if (new_term > Term)
+        {
+            Term = new_term;
+            //Find leader with id
+            foreach (Node node in GetMembers())
+            {
+                if (node.ID == l_id)
+                {
+                    Leader = node;
+                    //Debug.Log("New leader is: " + Leader.ID);
+                    return;
+                }
+            }
+        }
+    }
 
     public void TargetReached(GameObject target)
     {
@@ -215,7 +234,7 @@ public class Swarm : MonoBehaviour
 
     private void SaveResults()
     {
-        string path = "Assets/Results/";
+        string path = "Assets/Results_LE/";
         path += SceneManager.GetActiveScene().name;
         switch (CurrentPartitionPolicy)
         {

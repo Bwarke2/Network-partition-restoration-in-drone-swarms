@@ -61,7 +61,7 @@ public class TaskAssignmnet
         }
         
         //Send distance to sender
-        RecieverNode.GetComponent<Communication>().SendMsg<float>(RecieverNode, MsgTypes.ReturnBitMsg, sender_id, distance);
+        RecieverNode.GetComponent<Communication>().SendMsg<float>(MsgTypes.ReturnBitMsg, sender_id, distance);
     }
 
     public void AssignTasks(Node Auctioneer, List<Node> Nodes_to_assign)
@@ -124,7 +124,7 @@ public class TaskAssignmnet
         // Send auction message to neighbours
         foreach (Node node in Nodes_to_assign)
         {
-            Auctioneer.GetComponent<Communication>().SendMsg<string>(Auctioneer, MsgTypes.AnounceAuctionMsg, node.ID, target.name);
+            Auctioneer.GetComponent<Communication>().SendMsg<string>(MsgTypes.AnounceAuctionMsg, node.ID, target.name);
         }
         
         ConcludeAuction(Auctioneer,target,Nodes_to_assign);
@@ -169,7 +169,7 @@ public class TaskAssignmnet
                 Debug.Log("Failed to remove target from unreached list: " + target.name);
         }
         
-        Auctioneer.GetComponent<Communication>().SendMsg<string>(Auctioneer, MsgTypes.SetTargetMsg, min_bid_id, target.name);
+        Auctioneer.GetComponent<Communication>().SendMsg<string>(MsgTypes.SetTargetMsg, min_bid_id, target.name);
     }
 }
 

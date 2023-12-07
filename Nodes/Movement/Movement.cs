@@ -113,10 +113,13 @@ public class Movement : MonoBehaviour
         float dist = Vector2.Distance(GetComponent<Node>().transform.position, _target.position);
         if (dist < 0.001f)
         {
+            //Debug.Log("Target reached in node: " + GetComponent<Node>().name);
             string value = _target.gameObject.name;
             SetTarget(null);
             TargetReachedEvent(GetComponent<Node>());
-            GetComponent<Communication>().SendMsg<string>(GetComponent<Node>(), MsgTypes.TargetReachedMsg, GetComponent<Node>().GetLeaderID(), value);
+            int L_id = GetComponent<Node>().GetLeaderID();
+            //Debug.Log("Sending target reached message to leader: " + L_id);
+            GetComponent<Communication>().SendMsg<string>(MsgTypes.TargetReachedMsg, L_id, value);
             return true;
         }
         return false;
@@ -270,7 +273,7 @@ public class Movement : MonoBehaviour
         int numOfMembers = _swarm.GetMembers().Count;
         _swarm.AddDroppedNode();
         GetComponent<Communication>().SetNSN(numOfMembers);
-        GetComponent<Communication>().BroadcastMsg<int>(this.GetComponent<Node>(), MsgTypes.LostNodeDroppedMsg, numOfMembers);
+        GetComponent<Communication>().BroadcastMsg<int>(MsgTypes.LostNodeDroppedMsg, numOfMembers);
         _moveStrat.HandleLostNodeDropped(GetComponent<Node>());  
     }
 

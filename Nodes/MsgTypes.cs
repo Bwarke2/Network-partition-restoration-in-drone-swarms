@@ -10,5 +10,7 @@
         AnounceAuctionMsg,
         ReturnBitMsg,
         LostNodeDroppedMsg,
-        SwarmStuckMsg
+        SwarmStuckMsg,
+        ElectionMsg,
+        VoteMsg
     }

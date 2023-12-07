@@ -45,7 +45,7 @@ public class Node : MonoBehaviour
         RP = P_start;
         _swarm = GameObject.FindGameObjectWithTag("Swarm").GetComponent<Swarm>();
         _com = GetComponent<Communication>();
-        _leaderElection.Startup(_com);
+        _leaderElection.Startup(_com, ID);
         _movement = GetComponent<Movement>();
         _movement.Setup(_swarm);
     }
@@ -57,12 +57,8 @@ public class Node : MonoBehaviour
         if (name == "Node_leader")
         {
             Debug.Log("Running leader setup code");
-            _leaderElection.LeaderStart(ID);
-            _leaderElection.StartElection(_swarm.GetMembers());
-            _swarm.Leader = this;
-            _com.FindHopsToLeader();
-            
-            SendNewRP();
+            //_leaderElection.LeaderStart(ID)
+            StartCoroutine(LeaderElection());
             StartCoroutine(UpdateRP());
             StartCoroutine(TaskAssignment());
             //_TaskAssignment.AssignTasks(this, _swarm.GetMembers());
@@ -83,6 +79,11 @@ public class Node : MonoBehaviour
         NumSentMsgs = GetNumSentMsgs();
     }
 
+    float GetBattery()
+    {
+        return Bat;
+    }
+
     private void RecordDistance()
     {
         totalDistance += Vector3.Distance(transform.position, previousLoc);
@@ -93,6 +94,8 @@ public class Node : MonoBehaviour
     {
         while (true)
         {
+            yield return null;
+            yield return null;
             SendNewRP();
             //Debug.Log("RP updated");
             yield return new WaitForSeconds(1);
@@ -104,8 +107,19 @@ public class Node : MonoBehaviour
         while (true)
         {
             yield return null;
+            yield return null;
             _TaskAssignment.AssignTasks(this, _swarm.GetMembers());
             yield return new WaitForSeconds(10);
+        }
+    }
+
+    private IEnumerator LeaderElection()
+    {
+        while (true)
+        {
+            yield return null;
+            _leaderElection.StartElection(_swarm.GetMembers());
+            yield return new WaitForSeconds(20);
         }
     }
 
@@ -118,7 +132,7 @@ public class Node : MonoBehaviour
             if (node.ID != ID)
             {
                 //Debug.Log("Sending roll call to: " + node.ID);
-                _com.SendMsg<int>(this, MsgTypes.RollCallMsg, node.ID, ID);
+                _com.SendMsg<int>(MsgTypes.RollCallMsg, node.ID, ID);
             }
         }
     }
@@ -161,7 +175,7 @@ public class Node : MonoBehaviour
         foreach (Node node in _swarm.GetMembers())
         {
             //Change this later to send messages instead of changing variables
-            _com.SendMsg<Vector2>(this, MsgTypes.SetRPMsg, node.ID, RP);
+            _com.SendMsg<Vector2>(MsgTypes.SetRPMsg, node.ID, RP);
         }
     }
 
@@ -195,7 +209,7 @@ public class Node : MonoBehaviour
         {
             //Change this later to send messages instead of changing variables
             if (node.ID == node_id)
-                _com.SendMsg<Transform>(this, MsgTypes.SetTargetMsg, node.ID, target);
+                _com.SendMsg<Transform>(MsgTypes.SetTargetMsg, node.ID, target);
         }
     }
 
@@ -213,7 +227,7 @@ public class Node : MonoBehaviour
             Debug.Log("No target for leader");
             return;
         }
-        _com.BroadcastMsg<string>(this, MsgTypes.SwarmStuckMsg, _movement.GetTarget().name);
+        _com.BroadcastMsg<string>(MsgTypes.SwarmStuckMsg, _movement.GetTarget().name);
     }
 
     public void NoSwarmMovementMsgHandler(int sender_id, string value)
@@ -245,13 +259,19 @@ public class Node : MonoBehaviour
                 Debug.Log("Target not found in pursuing list");
             StartCoroutine(LeaderTargetReachedHandler(target));
         }
+        else
+        {
+            Debug.Log("Target reached by node: " + name);
+            Debug.Log("Wrong node recieved targetReachedMsg: " + name);
+        }
     }
 
     IEnumerator LeaderTargetReachedHandler(Transform target_reached)
     {
         yield return new WaitForSeconds(1);
         _TaskAssignment.AssignTasks(this, _swarm.GetMembers());
-        target_reached.gameObject.GetComponent<Target>().TargetReachedByNode();
+        if (target_reached != null)
+            target_reached.gameObject.GetComponent<Target>().TargetReachedByNode();
     }
 
     public void SetRPMsgHandler(int sender_id, string value) //Something is different here
@@ -285,6 +305,17 @@ public class Node : MonoBehaviour
     {
         //Debug.Log("Recieved lost node dropped msg");
         _movement.LostNodeDroppedMsgHandler(sender_id, value);
+    }
+
+    public void VoteMsgHandler(int sender_id, string value)
+    {
+        _leaderElection.HandleVoteMsg(sender_id, value);
+    }
+
+    public void ElectionMsgHandler(int sender_id, string value)
+    {
+        //Debug.Log("Recieved election message");
+        _leaderElection.HandleElectionMsg(sender_id, value);
     }
 
     

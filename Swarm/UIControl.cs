@@ -24,15 +24,21 @@ public class UIControl : MonoBehaviour
     {
         foreach (Node node in swarm.JoinedNodes)
         {
-            node.gameObject.GetComponent<Renderer>().material.color = Color.blue;
+            node.GetComponent<SpriteRenderer>().material.color = Color.blue;
+            node.GetComponent<SpriteRenderer>().color = Color.blue;
         }
 
         foreach (GameObject node in swarm.LostNodes)
         {
-            node.GetComponent<Renderer>().material.color = Color.black;
+            node.GetComponent<SpriteRenderer>().material.color = Color.black;
+            node.GetComponent<SpriteRenderer>().color = Color.black;
         }
 
-        swarm.Leader.gameObject.GetComponent<Renderer>().material.color = Color.yellow;
+        if(swarm.Leader != null)
+        {
+            swarm.Leader.GetComponent<SpriteRenderer>().material.color = Color.yellow;
+            swarm.Leader.GetComponent<SpriteRenderer>().color = Color.yellow;
+        }
     }
 
     public void DisplayTime(float timeToDisplay)
