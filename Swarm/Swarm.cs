@@ -48,12 +48,60 @@ public class Swarm : MonoBehaviour
         timer = this.GetComponent<MyTimer>();
         RemainingTargets.AddRange(GameObject.FindGameObjectsWithTag("Target"));
         UIControl = this.GetComponent<UIControl>();
+        CurrentPartitionPolicy = ChoosePartitionPolicy();
     }
     void Start()
     {
         timer.StartTimer();
         _simmulationRunning = true;
         StartCoroutine(UpdateCentralPosition());
+    }
+
+    private PartitionPolicy ChoosePartitionPolicy()
+    {
+        // Find shortest file in folder
+        string path = "Assets/Results/";
+        path += SceneManager.GetActiveScene().name;
+        DirectoryInfo di = new DirectoryInfo(path);
+        FileInfo[] files = di.GetFiles();
+        string shortest_file = "";
+        long shortest_file_length = long.MaxValue;
+
+         // Get a reference to each file in that directory.
+        foreach (FileInfo file in files)
+        {
+            if (file.Name.Contains("meta") == false)
+            {
+                //Debug.Log("File: " + file.Name + " Length: " + file.Length);
+                if (file.Length < shortest_file_length)
+                {
+                    shortest_file = file.Name;
+                    shortest_file_length = file.Length;
+                }
+            }  
+        }
+        //Debug.Log("Shortest file: " + shortest_file + " Length: " + shortest_file_length);
+        // Select partition policy based on shortest file
+        if (shortest_file.Contains("PRP1"))
+        {
+            Debug.Log("PRP1");
+            return PartitionPolicy.PRP1;
+        }
+        else if (shortest_file.Contains("PRP2"))
+        {
+            Debug.Log("PRP2");
+            return PartitionPolicy.PRP2;
+        }
+        else if (shortest_file.Contains("PRP3"))
+        {
+            Debug.Log("PRP3");
+            return PartitionPolicy.PRP3;
+        }
+        else
+        {
+            Debug.Log("No partition policy found");
+            return PartitionPolicy.PRP1;
+        }
     }
 
     // Update is called once per frame
