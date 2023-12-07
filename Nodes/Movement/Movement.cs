@@ -144,7 +144,7 @@ public class Movement : MonoBehaviour
 
         //Check if to far from connecting node
         float F_obj = in_node.FindFobj();
-        if (F_obj < 1)
+        if (F_obj < 1 && GetComponent<Communication>().GetConnectingNeighbor() != null)
         {
             TooFarEvent(in_node, GetComponent<Communication>().GetConnectingNeighbor());
             return;

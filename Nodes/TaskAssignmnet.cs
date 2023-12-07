@@ -19,8 +19,10 @@ public class TaskAssignmnet
     public void Setup()
     {
         Swarm swarm = GameObject.FindGameObjectWithTag("Swarm").GetComponent<Swarm>();
+        Unreached_Targets.Clear();
+        Pursuing_Targets.Clear();
 
-        foreach (GameObject go in GameObject.FindGameObjectsWithTag("Target"))
+        foreach (GameObject go in swarm.GetTargets())
             Unreached_Targets.Add(go.transform);
 
             //Sort targets based on distance to node start position
@@ -64,6 +66,17 @@ public class TaskAssignmnet
         RecieverNode.GetComponent<Communication>().SendMsg<float>(MsgTypes.ReturnBitMsg, sender_id, distance);
     }
 
+    public void HandleBroadcastWinnerMsg(int sender_id, int this_id, string value)
+    {
+        //Debug.Log("Recieved broadcast winner msg");
+        int winner_id = JsonConvert.DeserializeObject<int>(value);
+        if(winner_id == this_id)
+        {
+            //Debug.Log("Node: " + this_id + " won auction");
+            Setup();
+        }
+    }
+
     public void AssignTasks(Node Auctioneer, List<Node> Nodes_to_assign)
     {
         //Debug.Log("Node: " + Auctioneer.name + " is auctioning tasks");
@@ -101,18 +114,16 @@ public class TaskAssignmnet
         }
         //Debug.Log("Resheduled tasks: " + resheduledTasks.Count);
         tasks.AddRange(unsheduledTasks);
+        
+        //Remove empty
+        foreach (Pursuing_Targets_struct PT in resheduledTasks)
+            if (PT.target == null)
+            {
+                //Debug.Log("Removing null target");
+                currentTasks.Remove(PT);
+            }
+                
         //Debug.Log("Total tasks: " + tasks.Count);
-        /*int count = 0;
-        foreach (Transform task in tasks)
-        {
-            count++;
-            if (task == null)
-                Debug.Log("Task: " + count + " is null");
-        }
-
-        if(tasks.Count > _swarm.RemainingTargets.Count)
-            Debug.Log("More tasks (" + tasks.Count+ ") than targets: " + _swarm.RemainingTargets.Count);
-        */
         return tasks;
         
     }

@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class UIControl : MonoBehaviour
 {
-    private Swarm swarm;
+    private Swarm _swarm;
     public Text timeText;
     public Text distText;
     public Text N_msg_Text;
@@ -16,28 +16,28 @@ public class UIControl : MonoBehaviour
     {
         QualitySettings.vSyncCount = 0;
         Application.targetFrameRate = _targetFPS;
-        swarm = GameObject.FindGameObjectWithTag("Swarm").GetComponent<Swarm>();
+        _swarm = GameObject.FindGameObjectWithTag("Swarm").GetComponent<Swarm>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        foreach (Node node in swarm.JoinedNodes)
+        foreach (Node node in _swarm.JoinedNodes)
         {
             node.GetComponent<SpriteRenderer>().material.color = Color.blue;
             node.GetComponent<SpriteRenderer>().color = Color.blue;
         }
 
-        foreach (GameObject node in swarm.LostNodes)
+        foreach (GameObject node in _swarm.LostNodes)
         {
             node.GetComponent<SpriteRenderer>().material.color = Color.black;
             node.GetComponent<SpriteRenderer>().color = Color.black;
         }
 
-        if(swarm.Leader != null)
+        if(_swarm.Leader != null)
         {
-            swarm.Leader.GetComponent<SpriteRenderer>().material.color = Color.yellow;
-            swarm.Leader.GetComponent<SpriteRenderer>().color = Color.yellow;
+            _swarm.Leader.GetComponent<SpriteRenderer>().material.color = Color.yellow;
+            _swarm.Leader.GetComponent<SpriteRenderer>().color = Color.yellow;
         }
     }
 

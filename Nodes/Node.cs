@@ -56,13 +56,11 @@ public class Node : MonoBehaviour
         _com.UpdateNeighbours();
         if (name == "Node_leader")
         {
-            Debug.Log("Running leader setup code");
-            //_leaderElection.LeaderStart(ID)
-            StartCoroutine(LeaderElection());
-            StartCoroutine(UpdateRP());
-            StartCoroutine(TaskAssignment());
-            //_TaskAssignment.AssignTasks(this, _swarm.GetMembers());
+            _leaderElection.LeaderStart(ID);
         }
+        StartCoroutine(LeaderElection());
+        StartCoroutine(UpdateRP());
+        StartCoroutine(TaskAssignment());
     }
 
     // Update is called once per frame
@@ -94,9 +92,11 @@ public class Node : MonoBehaviour
     {
         while (true)
         {
+            
             yield return null;
             yield return null;
-            SendNewRP();
+            if (ID == _leaderElection.GetLeaderID())
+                SendNewRP();
             //Debug.Log("RP updated");
             yield return new WaitForSeconds(1);
         }
@@ -108,7 +108,8 @@ public class Node : MonoBehaviour
         {
             yield return null;
             yield return null;
-            _TaskAssignment.AssignTasks(this, _swarm.GetMembers());
+            if (ID == _leaderElection.GetLeaderID())
+                _TaskAssignment.AssignTasks(this, _swarm.GetMembers());
             yield return new WaitForSeconds(10);
         }
     }
@@ -118,7 +119,8 @@ public class Node : MonoBehaviour
         while (true)
         {
             yield return null;
-            _leaderElection.StartElection(_swarm.GetMembers());
+            if (ID == _leaderElection.GetLeaderID())
+                _leaderElection.StartElection(_swarm.GetMembers());
             yield return new WaitForSeconds(20);
         }
     }
@@ -299,6 +301,7 @@ public class Node : MonoBehaviour
     {
         //Debug.Log("Recieved broadcast winner msg");
         _leaderElection.HandleBroadcastWinnerMsg(sender_id, value);
+        _TaskAssignment.HandleBroadcastWinnerMsg(sender_id, ID, value);
     }
     
     public void LostNodeDroppedMsgHandler(int sender_id, string value)
