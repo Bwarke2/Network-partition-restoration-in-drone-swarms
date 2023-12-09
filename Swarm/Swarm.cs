@@ -271,6 +271,19 @@ public class Swarm : MonoBehaviour
         }
     }
 
+    public void AddMember(int node_id)
+    {
+        //Add node to member list
+        foreach (GameObject node in swarm)
+        {
+            if (node.GetComponent<Node>().ID == node_id)
+            {
+                AddMember(node.GetComponent<Node>());
+                return;
+            }
+        }
+    }
+
     public void RemoveMember(Node node)
     {
         //Remove node from member list
@@ -278,6 +291,27 @@ public class Swarm : MonoBehaviour
             JoinedNodes.Remove(node);
         if (LostNodes.Contains(node.gameObject) == false)
             LostNodes.Add(node.gameObject);
+    }
+
+    public void RemoveMember(int node_id)
+    {
+        //Remove node from member list
+        foreach (GameObject node in swarm)
+        {
+            if (node.GetComponent<Node>().ID == node_id)
+            {
+                RemoveMember(node.GetComponent<Node>());
+                return;
+            }
+        }
+    }
+
+    public void ClearMembers()
+    {
+        for (int i = JoinedNodes.Count - 1; i >= 0; i--)
+        {
+            RemoveMember(JoinedNodes[i]);
+        }
     }
 
     public List<Node> GetMembers()

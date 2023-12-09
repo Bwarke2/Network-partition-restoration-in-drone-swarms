@@ -20,6 +20,9 @@ public class Node : MonoBehaviour
 
     public int NumSentMsgs = 0;
 
+    //Heartbeat component
+    private HeartBeat _heartbeat;
+
     //Movement component
     private Movement _movement;
     
@@ -48,6 +51,8 @@ public class Node : MonoBehaviour
         _leaderElection.Startup(_com, ID);
         _movement = GetComponent<Movement>();
         _movement.Setup(_swarm);
+        _heartbeat = GetComponent<HeartBeat>();
+        
     }
 
     void Start()
@@ -58,6 +63,7 @@ public class Node : MonoBehaviour
         {
             _leaderElection.LeaderStart(ID);
         }
+        _heartbeat.Setup(ID, 0, _com);
         StartCoroutine(LeaderElection());
         StartCoroutine(UpdateRP());
         StartCoroutine(TaskAssignment());
@@ -300,8 +306,14 @@ public class Node : MonoBehaviour
     public void BroadcastWinnerMsgHandler(int sender_id, string value)
     {
         //Debug.Log("Recieved broadcast winner msg");
+        _heartbeat.HandleBroadcastWinnerMsg(value);
         _leaderElection.HandleBroadcastWinnerMsg(sender_id, value);
         _TaskAssignment.HandleBroadcastWinnerMsg(sender_id, ID, value);
+    }
+
+    public void HeartBeatMsgHandler(int sender_id, string value)
+    {
+        _heartbeat.HandleHeartBeatMsg(sender_id, value);
     }
     
     public void LostNodeDroppedMsgHandler(int sender_id, string value)
@@ -321,5 +333,18 @@ public class Node : MonoBehaviour
         _leaderElection.HandleElectionMsg(sender_id, value);
     }
 
-    
+    public void HeartBeatResponseMsgHandler(int sender_id, string value)
+    {
+        _heartbeat.HandleHearthBeatResponseMsg(sender_id, value);
+    }
+
+    public void PartitionMsgHandler(int sender_id, string value)
+    {
+        _movement.HandlePartitionMsg(sender_id, value);
+    }
+
+    public void PartitionRestoredMsgHandler(int sender_id, string value)
+    {
+        _movement.HandlePartitionRestoredMsg(sender_id, value);
+    }
 }

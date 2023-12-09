@@ -1,1 +1,2 @@
 Time; NumMsgSent; Distance; NodesLost
+167,6497;4003;789,2394;0;0

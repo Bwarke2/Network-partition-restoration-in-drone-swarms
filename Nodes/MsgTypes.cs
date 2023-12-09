@@ -12,5 +12,9 @@
         LostNodeDroppedMsg,
         SwarmStuckMsg,
         ElectionMsg,
-        VoteMsg
+        VoteMsg,
+        HeartBeatMsg,
+        HeartBeatResponseMsg,
+        PartitionMsg,
+        PartitionRestoredMsg
     }

@@ -141,12 +141,13 @@ public class LeaderElection
         _swarm.SetLeader(L_id, Term);
         //Debug.Log("New leader is: " + L_id);
         //Broadcast winner to neighbours
+        
+        _com.GetComponent<HeartBeat>().SetLeader(L_id);
         _com.BroadcastMsg<int>(MsgTypes.Broadcast_WinnerMsg, L_id);
     }
 
     public void HandleBroadcastWinnerMsg(int sender_id, string value)
     {
         L_id = JsonConvert.DeserializeObject<int>(value);
-        //Debug.Log("New leader is: " + L_id);
     }
 }

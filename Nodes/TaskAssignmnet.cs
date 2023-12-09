@@ -116,12 +116,14 @@ public class TaskAssignmnet
         tasks.AddRange(unsheduledTasks);
         
         //Remove empty
-        foreach (Pursuing_Targets_struct PT in resheduledTasks)
-            if (PT.target == null)
+        for (int i = 0; i < tasks.Count; i++)
+        {
+            if (tasks[i] == null)
             {
-                //Debug.Log("Removing null target");
-                currentTasks.Remove(PT);
+                tasks.RemoveAt(i);
+                i--;
             }
+        }
                 
         //Debug.Log("Total tasks: " + tasks.Count);
         return tasks;

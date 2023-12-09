@@ -197,6 +197,18 @@ public class Communication : MonoBehaviour
             case MsgTypes.VoteMsg:
                 Recieving_node.VoteMsgHandler(sender_id, value);
                 break;
+            case MsgTypes.HeartBeatMsg:
+                Recieving_node.HeartBeatMsgHandler(sender_id, value);
+                break;
+            case MsgTypes.HeartBeatResponseMsg:
+                Recieving_node.HeartBeatResponseMsgHandler(sender_id, value);
+                break;
+            case MsgTypes.PartitionMsg:
+                Recieving_node.PartitionMsgHandler(sender_id, value);
+                break;
+            case MsgTypes.PartitionRestoredMsg:
+                Recieving_node.PartitionRestoredMsgHandler(sender_id, value);
+                break;
         }
     }
 

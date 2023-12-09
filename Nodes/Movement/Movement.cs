@@ -6,10 +6,13 @@ using Newtonsoft.Json;
 public class Movement : MonoBehaviour
 {
     private IMovementStrategy _moveStrat = new NoTargetStrategy();
+    [SerializeField]
+    private string _strategyName;
     private Swarm _swarm;
     [SerializeField]
     private Transform _target;
-
+    private int _max_nodes = 0;
+    private int _currentNrNodes = 0;
     public List<Vector2> Path = new List<Vector2>();
     private Queue<Vector2> _lastPositions = new Queue<Vector2>();
     public Vector2 Last_Target_Pos;
@@ -20,6 +23,8 @@ public class Movement : MonoBehaviour
     public void Setup(Swarm swarm)
     {
         _swarm = swarm;
+        _max_nodes = _swarm.GetMembers().Count;
+        _currentNrNodes = _max_nodes;
         Path.Add(transform.position);
         Last_Target_Pos = transform.position;
         SetStrategy(new NoTargetStrategy());
@@ -85,6 +90,7 @@ public class Movement : MonoBehaviour
         {
             _moveStrat = moveStrat;
             _moveStrat.SetMovement(this);
+            _strategyName = _moveStrat.GetType().Name;
         }
     }
 
@@ -133,14 +139,15 @@ public class Movement : MonoBehaviour
     public void CheckForMovementEvents(Node in_node)
     {
         //Check if partition has happened
+        /*
         if (_swarm.GetMembers().Count < GetComponent<Communication>().GetNSN())
         {
             LostNodeEvent(in_node);
             return;
-        }
+        }*/
         
         //Check if partition is restored
-        CheckIfPartitionIsRestored(in_node);
+        //CheckIfPartitionIsRestored(in_node);
 
         //Check if to far from connecting node
         float F_obj = in_node.FindFobj();
@@ -181,7 +188,7 @@ public class Movement : MonoBehaviour
         }
     }
 
-    private void CheckIfPartitionIsRestored(Node in_node)
+    /*private void CheckIfPartitionIsRestored(Node in_node)
     {
         if (_moveStrat is ILostNodePRP || _moveStrat is SwarmPRP)
         {
@@ -190,7 +197,7 @@ public class Movement : MonoBehaviour
                 PartitionRestoredEvent(in_node);
             }
         }
-    }
+    }*/
 
     public void LostNodeEvent(Node node)
     {
@@ -206,6 +213,31 @@ public class Movement : MonoBehaviour
         }
         GetComponent<Communication>().SetNSN(_swarm.GetMembers().Count);
         _moveStrat.HandlePartitionRestored(node);
+    }
+
+    public void HandlePartitionMsg(int sender_id, string value)
+    {
+        //Debug.Log("Lost node message recieved in node: " + GetComponent<Node>().name);
+        int lostNode_id = JsonConvert.DeserializeObject<int>(value);
+        Debug.Log("Lost connection to node: " + lostNode_id + " in node: " + GetComponent<Node>().name);
+        _currentNrNodes--;
+        LostNodeEvent(GetComponent<Node>());
+    }
+
+    public void HandlePartitionRestoredMsg(int sender_id, string value)
+    {
+        //Check if all partitions are restored
+        int lostNode_id = JsonConvert.DeserializeObject<int>(value);
+        Debug.Log("Node rejoined network: " + GetComponent<Node>().name);
+        _currentNrNodes++;
+        if (_currentNrNodes < _max_nodes)
+            return;
+        else if (_currentNrNodes > _max_nodes)
+        {
+            _max_nodes = _currentNrNodes;
+            Debug.Log("Max nodes increased to: " + _max_nodes);
+        }
+        PartitionRestoredEvent(GetComponent<Node>());
     }
 
     public void TargetReachedEvent(Node node)
