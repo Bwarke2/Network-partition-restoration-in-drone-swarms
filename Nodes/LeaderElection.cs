@@ -13,12 +13,14 @@ public class LeaderElection
     private Dictionary<int, float> Votes = new Dictionary<int, float>();
     private int _id = 0;
     private Swarm _swarm;
+    public bool Do_elctions = false;
 
-    public void Startup(Communication com, int id)
+    public void Startup(Communication com, int id, bool do_elections)
     {
         _com = com;
         _swarm = GameObject.FindGameObjectWithTag("Swarm").GetComponent<Swarm>();
         _id = id;
+        Do_elctions = do_elections;
     }
 
     public void LeaderStart(int leader_id)

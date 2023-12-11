@@ -97,6 +97,7 @@ public class HeartBeat : MonoBehaviour
                 {
                     _followers.Add(response.Key);
                     _com.BroadcastMsg<int>(MsgTypes.PartitionRestoredMsg, response.Key);
+                    Debug.Log("Partition restored with node: " + response.Key);
                 }
                     
                 timely_responses.Add(response.Key, response.Value);
@@ -104,11 +105,13 @@ public class HeartBeat : MonoBehaviour
             }
             else
             {
-                Debug.Log("Node: " + response.Key + " did not respond in time");
                 if(_followers.Contains(response.Key))
                 {
+                    Debug.Log("Node: " + response.Key + " did not respond in time");
                     _followers.Remove(response.Key);
                     _com.BroadcastMsg<int>(MsgTypes.PartitionMsg, response.Key);
+                    //Send a msg to this node that a node is lost
+                    _com.SendMsg<int>(MsgTypes.PartitionMsg, _this_id, response.Key);
                 }
             }
         }
@@ -119,10 +122,10 @@ public class HeartBeat : MonoBehaviour
     private void RemoveLateResponses()
     {
         Dictionary<int, float> responses = UpdateResponses();
-        if (responses.Count > 0)
+        /*if (responses.Count > 0)
         {
             Debug.Log("Responses: " + responses.Count);
-        }
+        }*/
     }
 
     IEnumerator HeartBeatTimeOut()

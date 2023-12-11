@@ -5,7 +5,7 @@ using UnityEngine;
 public class SwarmPRP : IMovementStrategy
 {
     private Movement _movement;
-    private bool _waitingForLostNode = false;
+    //private bool _waitingForLostNode = false;
     public void SetMovement(Movement movement)
     {
         _movement = movement;
@@ -19,15 +19,19 @@ public class SwarmPRP : IMovementStrategy
         if (node.RP == null)
             return node.transform.position;
 
+        if (_movement.GetWaitingForLostNode() == true)
+            return node.transform.position;
+
         if (Vector2.Distance(node.transform.position, node.RP) < 3.5f)
         {
-            if ((node.ID == node.GetLeaderID()) && (_waitingForLostNode == false))
+            Debug.Log("Reached RP");
+            if ((node.ID == node.GetLeaderID()))
             {
                 Debug.Log("Leader Waiting for lost node");
                 _movement.RPReachedByLeaderEvent();
             }
             _movement.SetWaitingForLostNode(true);
-            _waitingForLostNode = true;
+            //_waitingForLostNode = true;
             //Dont move if within range of RP
             return node.transform.position;
         }
@@ -53,11 +57,7 @@ public class SwarmPRP : IMovementStrategy
     public void HandlePartitionRestored(Node node)
     {
         float distance = Vector2.Distance(node.transform.position, node.RP);
-        if (distance > 3.1f)
-        {
-            //Debug.Log("Distance to RP: " + distance);
-            return;
-        }
+        
         if (_movement.GetTarget() == null)
         {
             _movement.SetStrategy(new NoTargetStrategy());

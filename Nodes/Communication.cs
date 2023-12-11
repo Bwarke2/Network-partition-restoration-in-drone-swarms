@@ -57,7 +57,10 @@ public class Communication : MonoBehaviour
     {
         //Find min hop count to leader among neighbors
         if (GetComponent<Node>().GetInstanceID() == _swarm.Leader.GetInstanceID())
+        {
+            ConnectedToLeader = true;
             return Hops = 0;
+        }
         
         int min_hop = int.MaxValue;
         foreach (GameObject node in NB)

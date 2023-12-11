@@ -48,7 +48,7 @@ public class Node : MonoBehaviour
         RP = P_start;
         _swarm = GameObject.FindGameObjectWithTag("Swarm").GetComponent<Swarm>();
         _com = GetComponent<Communication>();
-        _leaderElection.Startup(_com, ID);
+        _leaderElection.Startup(_com, ID,false);
         _movement = GetComponent<Movement>();
         _movement.Setup(_swarm);
         _heartbeat = GetComponent<HeartBeat>();
@@ -128,6 +128,8 @@ public class Node : MonoBehaviour
             if (ID == _leaderElection.GetLeaderID())
                 _leaderElection.StartElection(_swarm.GetMembers());
             yield return new WaitForSeconds(20);
+                if (_leaderElection.Do_elctions == false)
+                    break; //Only do one election
         }
     }
 
@@ -193,10 +195,16 @@ public class Node : MonoBehaviour
         switch (_swarm.GetPartitionPolicy())
         {
             case PartitionPolicy.PRP1:
-                RP = _movement.Path.Last();
+                if (_movement.Path.Last() != null)
+                    RP = _movement.Path.Last();
+                else    
+                    RP = _movement.GetTarget().position;
                 break;
             case PartitionPolicy.PRP2:
-                RP = _movement.Path.Last();
+                if (_movement.Path.Last() != null)
+                    RP = _movement.Path.Last();
+                else
+                    RP = _movement.GetTarget().position;
                 break;
             case PartitionPolicy.PRP3:
                 if (_movement.GetTarget() != null)

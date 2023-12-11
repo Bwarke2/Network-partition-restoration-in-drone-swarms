@@ -277,17 +277,12 @@ public class Movement : MonoBehaviour
         _moveStrat.HandleNoSwarmMovement(node,newTarget);
     }
 
-    public void LostNodeDroppedEvent(Node node)
-    {
-        _moveStrat.HandleLostNodeDropped(node);
-    }
-
     public void LostNodeDroppedMsgHandler(int sender_id, string value)
     {
         int num_of_members = JsonConvert.DeserializeObject<int>(value);
         Debug.Log("Lost node dropped in node: " + GetComponent<Node>().name + ", new NSN: " + num_of_members);
         GetComponent<Communication>().SetNSN(num_of_members);
-        _moveStrat.HandleLostNodeDropped(GetComponent<Node>());   
+        LostNodeEvent(GetComponent<Node>());   
     }
 
     public void RPReachedByLeaderEvent()
