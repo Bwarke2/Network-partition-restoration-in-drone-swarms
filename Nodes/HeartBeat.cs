@@ -70,7 +70,7 @@ public class HeartBeat : MonoBehaviour
     {
         int term = JsonConvert.DeserializeObject<int>(value);
         //Debug.Log("HeartBeat recieved from: " + sender_id + " with term: " + term);
-        if (sender_id != _L_ID)
+        if (sender_id != _L_ID && ConnectedToLeader == ConnectedToLeader.Connected)
         {
             Debug.Log("HeartBeat recieved from non leader node: " + sender_id);
             //Handle other leader observed
