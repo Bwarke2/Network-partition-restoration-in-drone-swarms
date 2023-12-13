@@ -13,7 +13,7 @@ public class LeaderElection
     private Dictionary<int, float> Votes = new Dictionary<int, float>();
     private int _id = 0;
     private Swarm _swarm;
-    public bool Do_elctions = false;
+    public bool Do_elctions = true;
 
     public void Startup(Communication com, int id, bool do_elections)
     {

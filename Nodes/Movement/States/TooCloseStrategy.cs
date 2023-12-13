@@ -80,6 +80,29 @@ public class TooCloseStrategy : IMovementStrategy
 
     public void HandleNormalRange(Node node)
     {
+        Swarm swarm = GameObject.FindGameObjectWithTag("Swarm").GetComponent<Swarm>();
+        IMovementStrategy newStrat;
+        if (node.GetComponent<Communication>().ConnectedToLeader == false)
+        {
+            switch (swarm.GetPartitionPolicy())
+            {
+                case PartitionPolicy.PRP1:
+                    newStrat = new LostNodePRP1();
+                    break;
+                case PartitionPolicy.PRP2:
+                    newStrat = new LostNodePRP2();
+                    break;
+                case PartitionPolicy.PRP3:
+                    newStrat = new LostNodePRP3();
+                    break;
+                default:
+                    newStrat = new LostNodePRP1();
+                    break;
+            }
+            _movement.SetStrategy(newStrat);
+            return;
+
+        }
         if (_movement.GetTarget() == null)
         {
             _movement.SetStrategy(new NoTargetStrategy());

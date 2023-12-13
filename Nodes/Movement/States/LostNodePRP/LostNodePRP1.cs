@@ -33,4 +33,10 @@ public class LostNodePRP1 : ILostNodePRP
         }
         _movement.SetStrategy(new TargetStrategy());
     }
+
+    public void HandleHBEvent(Node node)
+    {
+        //Debug.Log("Lost node PRP 1");
+        HandlePartitionRestored(node);
+    }
 }

@@ -25,4 +25,6 @@ public interface IMovementStrategy
     virtual public void HandleLostNodeDropped(Node node){}
     virtual public void HandleNoMovement(Node node){}
     abstract public Vector3 GetDesiredPosition(Node node);
+
+    virtual public void HandleHBEvent(Node node){}
 }

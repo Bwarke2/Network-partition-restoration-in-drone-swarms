@@ -14,6 +14,7 @@ public class Node : MonoBehaviour
     public Vector2 RP;       //Rendezvous Point
     public float Bat = 100;         //Battery
     
+    public bool Do_elctions = true;
     //Metrics
     public float totalDistance = 0;
     private Vector3 previousLoc = Vector3.zero; //Used to calculate total distance
@@ -48,7 +49,7 @@ public class Node : MonoBehaviour
         RP = P_start;
         _swarm = GameObject.FindGameObjectWithTag("Swarm").GetComponent<Swarm>();
         _com = GetComponent<Communication>();
-        _leaderElection.Startup(_com, ID,false);
+        _leaderElection.Startup(_com, ID, Do_elctions);
         _movement = GetComponent<Movement>();
         _movement.Setup(_swarm);
         _heartbeat = GetComponent<HeartBeat>();
@@ -314,19 +315,21 @@ public class Node : MonoBehaviour
     public void BroadcastWinnerMsgHandler(int sender_id, string value)
     {
         //Debug.Log("Recieved broadcast winner msg");
-        _heartbeat.HandleBroadcastWinnerMsg(value);
         _leaderElection.HandleBroadcastWinnerMsg(sender_id, value);
         _TaskAssignment.HandleBroadcastWinnerMsg(sender_id, ID, value);
+        _heartbeat.HandleBroadcastWinnerMsg(value);
     }
 
     public void HeartBeatMsgHandler(int sender_id, string value)
     {
         _heartbeat.HandleHeartBeatMsg(sender_id, value);
+        _movement.HeartBeatEvent(this);
     }
     
     public void LostNodeDroppedMsgHandler(int sender_id, string value)
     {
         //Debug.Log("Recieved lost node dropped msg");
+        _heartbeat.HandleLostNodeDroppedMsg(sender_id, value);
         _movement.LostNodeDroppedMsgHandler(sender_id, value);
     }
 

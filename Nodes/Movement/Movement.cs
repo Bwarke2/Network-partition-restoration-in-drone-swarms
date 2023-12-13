@@ -204,6 +204,11 @@ public class Movement : MonoBehaviour
         _moveStrat.HandleLostNode(node, GetComponent<Communication>(), this, _swarm);
     }
 
+    public void HeartBeatEvent(Node node)
+    {
+        _moveStrat.HandleHBEvent(node);
+    }
+
     public void PartitionRestoredEvent(Node node)
     {
         if (_waitingForLostNode)
@@ -228,14 +233,14 @@ public class Movement : MonoBehaviour
     {
         //Check if all partitions are restored
         int lostNode_id = JsonConvert.DeserializeObject<int>(value);
-        Debug.Log("Node rejoined network: " + GetComponent<Node>().name);
+        //Debug.Log("Node rejoined network: " + GetComponent<Node>().name);
         _currentNrNodes++;
         if (_currentNrNodes < _max_nodes)
             return;
         else if (_currentNrNodes > _max_nodes)
         {
             _max_nodes = _currentNrNodes;
-            Debug.Log("Max nodes increased to: " + _max_nodes);
+            //Debug.Log("Max nodes increased to: " + _max_nodes);
         }
         PartitionRestoredEvent(GetComponent<Node>());
     }
@@ -282,7 +287,8 @@ public class Movement : MonoBehaviour
         int num_of_members = JsonConvert.DeserializeObject<int>(value);
         Debug.Log("Lost node dropped in node: " + GetComponent<Node>().name + ", new NSN: " + num_of_members);
         GetComponent<Communication>().SetNSN(num_of_members);
-        LostNodeEvent(GetComponent<Node>());   
+        _max_nodes--;
+        _moveStrat.HandleLostNodeDropped(GetComponent<Node>());
     }
 
     public void RPReachedByLeaderEvent()
@@ -301,7 +307,8 @@ public class Movement : MonoBehaviour
         _swarm.AddDroppedNode();
         GetComponent<Communication>().SetNSN(numOfMembers);
         GetComponent<Communication>().BroadcastMsg<int>(MsgTypes.LostNodeDroppedMsg, numOfMembers);
-        _moveStrat.HandleLostNodeDropped(GetComponent<Node>());  
+        GetComponent<Communication>().SendMsg<int>(MsgTypes.LostNodeDroppedMsg, 
+            GetComponent<Node>().ID, numOfMembers);
     }
 
     public void SetWaitingForLostNode(bool value)

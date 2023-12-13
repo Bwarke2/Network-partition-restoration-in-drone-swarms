@@ -3,6 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using Newtonsoft.Json;
 
+public enum ConnectedToLeader
+{
+    Connected,
+    NotConnected,
+    Leader
+}
+
 public class HeartBeat : MonoBehaviour
 {
     [SerializeField]
@@ -11,6 +18,8 @@ public class HeartBeat : MonoBehaviour
     private int _this_id;
     private Communication _com;
     private int _term = 0;
+    private int _NumMembers = 6;
+    public ConnectedToLeader ConnectedToLeader = ConnectedToLeader.NotConnected;
     private const float max_response_time = 3;
     private Dictionary<int, float> _heart_beat_responses = new Dictionary<int, float>();
     private IEnumerator HeartBeatTimeOut_coroutine;
@@ -19,6 +28,10 @@ public class HeartBeat : MonoBehaviour
     // Leader attributes
     [SerializeField]
     private List<int> _followers = new List<int>();
+    [SerializeField]
+    private List<int> _lost = new List<int>();
+    [SerializeField]
+    private Dictionary<int,int> _numOfPartitions = new Dictionary<int, int>();
 
     public void Setup(int this_id, int L_id, Communication communication)
     {
@@ -40,6 +53,11 @@ public class HeartBeat : MonoBehaviour
         _term = term;
     }
 
+    public void SetNumMembers(int num_members)
+    {
+        _NumMembers = num_members;
+    }
+
     private void SendHeartBeat()
     {
         //Send HeartBeat
@@ -58,6 +76,7 @@ public class HeartBeat : MonoBehaviour
             //Handle other leader observed
             return;
         }
+        ConnectedToLeader = ConnectedToLeader.Connected;
         //Debug.Log("Stopping HeartBeat timeout in node: " + _this_id);
         StopCoroutine(HeartBeatTimeOut_coroutine);
         HeartBeatTimeOut_coroutine = HeartBeatTimeOut();
@@ -68,9 +87,26 @@ public class HeartBeat : MonoBehaviour
     public void HandleBroadcastWinnerMsg(string value)
     {
         int L_id = JsonConvert.DeserializeObject<int>(value);
+        ConnectedToLeader = ConnectedToLeader.NotConnected;
         //Debug.Log("Recieved broadcast winner msg with leader: " + L_id);
         SetLeader(L_id);
         _term++;
+        
+        StopAllCoroutines();
+        NewHeartBeatTimer_coroutine = NewHeartBeatTimer();
+        HeartBeatTimeOut_coroutine = HeartBeatTimeOut();
+        StartCoroutine(NewHeartBeatTimer_coroutine);
+        if(_L_ID == _this_id)
+        {
+            //Debug.Log("Stopping HeartBeat timeout in node: " + _this_id);
+            ConnectedToLeader = ConnectedToLeader.Leader;
+        }
+    }
+
+    public void HandleLostNodeDroppedMsg(int sender_id, string value)
+    {
+        int num_members = JsonConvert.DeserializeObject<int>(value);
+        SetNumMembers(num_members);
     }
 
     public void HandleHearthBeatResponseMsg(int Sender, string value)
@@ -96,8 +132,14 @@ public class HeartBeat : MonoBehaviour
                 if (!_followers.Contains(response.Key))
                 {
                     _followers.Add(response.Key);
-                    _com.BroadcastMsg<int>(MsgTypes.PartitionRestoredMsg, response.Key);
-                    Debug.Log("Partition restored with node: " + response.Key);
+                    if(_lost.Contains(response.Key))
+                    {
+                        _lost.Remove(response.Key);
+                        Debug.Log("Partition restored with node: " + response.Key);
+                        _com.BroadcastMsg<int>(MsgTypes.PartitionRestoredMsg, response.Key);
+                        _com.SendMsg<int>(MsgTypes.PartitionRestoredMsg, _this_id, response.Key);
+                    }
+                    
                 }
                     
                 timely_responses.Add(response.Key, response.Value);
@@ -109,23 +151,27 @@ public class HeartBeat : MonoBehaviour
                 {
                     Debug.Log("Node: " + response.Key + " did not respond in time");
                     _followers.Remove(response.Key);
-                    _com.BroadcastMsg<int>(MsgTypes.PartitionMsg, response.Key);
-                    //Send a msg to this node that a node is lost
-                    _com.SendMsg<int>(MsgTypes.PartitionMsg, _this_id, response.Key);
+                    _lost.Add(response.Key);
+                    if(!_numOfPartitions.ContainsKey(response.Key))
+                        _numOfPartitions.Add(response.Key, 1);
+                    else
+                        _numOfPartitions[response.Key]++;
+                    if(_numOfPartitions[response.Key] < 10)
+                    {
+                        _com.BroadcastMsg<int>(MsgTypes.PartitionMsg, response.Key);
+                        //Send a msg to this node that a node is lost
+                        _com.SendMsg<int>(MsgTypes.PartitionMsg, _this_id, response.Key);
+                    }
+                    else
+                    {
+                        //Stop caring about node
+                        _lost.Remove(response.Key);
+                    }
                 }
             }
         }
         timely_responses.Add(_this_id, Time.time);
         return timely_responses;
-    }
-
-    private void RemoveLateResponses()
-    {
-        Dictionary<int, float> responses = UpdateResponses();
-        /*if (responses.Count > 0)
-        {
-            Debug.Log("Responses: " + responses.Count);
-        }*/
     }
 
     IEnumerator HeartBeatTimeOut()
@@ -135,6 +181,7 @@ public class HeartBeat : MonoBehaviour
         {
             Debug.Log("HeartBeat timeout in node: " + _this_id);
             Node thisNode = GetComponent<Node>();
+            ConnectedToLeader = ConnectedToLeader.NotConnected;
             GetComponent<Movement>().LostNodeEvent(thisNode);
         }
             
@@ -149,7 +196,7 @@ public class HeartBeat : MonoBehaviour
             if (_L_ID == _this_id)
             {
                 SendHeartBeat();
-                RemoveLateResponses();
+                UpdateResponses();
             }
                 
             yield return new WaitForSeconds(1);

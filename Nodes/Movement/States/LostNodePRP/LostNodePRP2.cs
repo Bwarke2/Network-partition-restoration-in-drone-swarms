@@ -41,6 +41,10 @@ public class LostNodePRP2 : ILostNodePRP
     public virtual void HandleNoMovement(Node node)
     {
         //Go to last position instead of RP
+        if (Vector2.Distance(node.transform.position, node.RP) < 0.1f)
+        {
+            return;
+        }
         //Debug.Log("No movement in node " + node.ID + " going to last position");
         if (_movement.Path.Count == 0)
         {
@@ -48,5 +52,11 @@ public class LostNodePRP2 : ILostNodePRP
             return;
         }
         _movement.SetStrategy(new LostNodePRP2_returnpath());
+    }
+
+    public void HandleHBEvent(Node node)
+    {
+        //Debug.Log("Lost node PRP 1");
+        HandlePartitionRestored(node);
     }
 }

@@ -39,19 +39,19 @@ public class SwarmPRP : IMovementStrategy
         //Move toward RP
         return node.RP;
     }
-
+    /*
     public void HandleTooClose(Node node, List<Node> neighbors)
     {
         _movement.SetStrategy(new TooCloseStrategy());
         
         _movement.GetStrategy().SetNeighbors(neighbors);
     }
-
+    
     public void HandleTooFar(Node node, Node connectingNode)
     {
         _movement.SetStrategy(new TooFarStrategy());
         _movement.GetStrategy().SetConnectingNode(connectingNode);
-    }
+    }*/
 
     
     public void HandlePartitionRestored(Node node)
