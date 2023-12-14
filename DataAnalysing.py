@@ -132,5 +132,5 @@ def AnalyseScenario(path):
 
 
 # Get the data from the csv files
-path = '.\Results_LE\Scenario2'
+path = '.\Results_No_LE\Scenario2'
 AnalyseScenario(path)

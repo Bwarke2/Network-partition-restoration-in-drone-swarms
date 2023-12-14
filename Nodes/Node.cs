@@ -48,6 +48,7 @@ public class Node : MonoBehaviour
         Position = P_start;   
         RP = P_start;
         _swarm = GameObject.FindGameObjectWithTag("Swarm").GetComponent<Swarm>();
+        Do_elctions = _swarm.DoElections;
         _com = GetComponent<Communication>();
         _leaderElection.Startup(_com, ID, Do_elctions);
         _movement = GetComponent<Movement>();
@@ -155,9 +156,10 @@ public class Node : MonoBehaviour
 
     public float FindFobj() //Basic version
     {
+        float margin = 0.5f;
         if (ID == _leaderElection.GetLeaderID())
             return 1;
-        return (com_range - DistanceToConnectedNeighbor());
+        return (com_range - margin - DistanceToConnectedNeighbor());
     }
 
     private float DistanceToConnectedNeighbor()

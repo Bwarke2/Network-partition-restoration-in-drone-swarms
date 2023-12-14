@@ -29,13 +29,14 @@ public class Swarm : MonoBehaviour
     //Metrics
     public float TotalDistance = 0;
     public int NumSentMsgs = 0;
-
+    public float TimeScale = 1;
     public Node Leader;
 
     [SerializeField]
     private PartitionPolicy CurrentPartitionPolicy = PartitionPolicy.PRP1;
 
     public bool Random = false;
+    public bool DoElections = false;
     //UI
     public UIControl UIControl = null;
 
@@ -51,8 +52,8 @@ public class Swarm : MonoBehaviour
         
         if(Random == true)
         {
-            RemainingTargets.AddRange(GetComponent<TargetGenerator>().GenerateRandomTargets(20));
-            GetComponent<ObstacleGenerator>().GenerateRandomObstacle(10);
+            RemainingTargets.AddRange(GetComponent<TargetGenerator>().GenerateRandomTargets(15));
+            GetComponent<ObstacleGenerator>().GenerateRandomObstacle(7);
         }
         else
         {
@@ -65,7 +66,7 @@ public class Swarm : MonoBehaviour
             return Vector2.Distance(a.transform.position, FindCenterPositionOfSwarm()).CompareTo(Vector2.Distance(b.transform.position, FindCenterPositionOfSwarm()));
         });
 
-        
+        Time.timeScale = TimeScale;
         UIControl = this.GetComponent<UIControl>();
         CurrentPartitionPolicy = ChoosePartitionPolicy();
     }
@@ -79,7 +80,11 @@ public class Swarm : MonoBehaviour
     private PartitionPolicy ChoosePartitionPolicy()
     {
         // Find shortest file in folder
-        string path = "Assets/Results_LE/";
+        string path = "Assets/";
+        if (DoElections)
+            path += "Results_LE/"; 
+        else
+            path += "Results_No_LE/";   
         path += SceneManager.GetActiveScene().name;
         DirectoryInfo di = new DirectoryInfo(path);
         FileInfo[] files = di.GetFiles();
@@ -134,7 +139,7 @@ public class Swarm : MonoBehaviour
             NumSentMsgs = CalTotalSentMsgs();
             UIControl.DisplayNumSentMsgs(NumSentMsgs);
 
-            if (timer.GetTimer() > 600)
+            if (timer.GetTimer() > 900)
             {
                 timer.StopTimer();
                 Debug.Log("Time limit reached");
@@ -252,7 +257,11 @@ public class Swarm : MonoBehaviour
 
     private void SaveResults()
     {
-        string path = "Assets/Results_LE/";
+        string path = "Assets/";
+        if (DoElections)
+            path += "Results_LE/"; 
+        else
+            path += "Results_No_LE/";  
         path += SceneManager.GetActiveScene().name;
         switch (CurrentPartitionPolicy)
         {
@@ -270,7 +279,7 @@ public class Swarm : MonoBehaviour
         }
         StreamWriter writer = new StreamWriter(path, true);
         int nodes_lost = swarm.Count - GetMembers().Count;
-        if (timer.GetTimer() > 600)
+        if (timer.GetTimer() > 900)
             nodes_lost = swarm.Count;
         writer.WriteLine(timer.GetTimer() + ";" + NumSentMsgs + ";" + TotalDistance + ";" + nodes_lost + ";" + RemainingTargets.Count);
         writer.Close();

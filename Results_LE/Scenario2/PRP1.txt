@@ -1,1 +1,2 @@
-Time;NumMsgSent;Distance;NodesLost
+Time; NumMsgSent; Distance; NodesLost;Targets_left
+

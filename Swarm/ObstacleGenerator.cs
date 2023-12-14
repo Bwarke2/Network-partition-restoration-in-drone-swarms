@@ -37,7 +37,7 @@ public class ObstacleGenerator : MonoBehaviour
 
     GameObject CreateObstacle(Vector3 newposition,Quaternion rotation)
     {
-        if(Physics.CheckSphere(newposition, 2f))
+        if(Physics.CheckSphere(newposition, 4f))
         {
             Debug.Log("Obstacle is too close to another target");
             return null;

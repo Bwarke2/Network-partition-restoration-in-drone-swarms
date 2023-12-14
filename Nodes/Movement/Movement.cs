@@ -18,7 +18,7 @@ public class Movement : MonoBehaviour
     public Vector2 Last_Target_Pos;
     public const float Safe = 1;   //Safe distance from other nodes
     private bool _waitingForLostNode = false;
-    private int _waitTime = 30;
+    private int _waitTime = 60;
 
     public void Setup(Swarm swarm)
     {
@@ -44,7 +44,7 @@ public class Movement : MonoBehaviour
         Vector3 desiredPos = _moveStrat.GetDesiredPosition(node);
         MoveNode.MoveToward(node, desiredPos);
         CheckIfTargetReached();
-        if (_lastPositions.Count >= 20)
+        if (_lastPositions.Count >= 10)
         {
             if (!CheckIfMoved(FindAveragePosition(), node.transform.position))
             {
@@ -73,7 +73,7 @@ public class Movement : MonoBehaviour
         float dist = Vector2.Distance(averagePos, currentPos);
         //if (GetComponent<Node>().debug_node == true)
             //Debug.Log("Distance moved: " + dist);
-        if (dist < 0.005)
+        if (dist < 0.05)
         {
             //Debug.Log("Node did not move");
             return false;
@@ -301,7 +301,10 @@ public class Movement : MonoBehaviour
     {
         _waitingForLostNode = true;
         Debug.Log("Waiting for lost node");
-        yield return new WaitForSeconds(_waitTime);
+        if (_swarm.GetPartitionPolicy() != PartitionPolicy.PRP1)
+            yield return new WaitForSeconds(_waitTime);
+        else
+            yield return null;
         Debug.Log("Done waiting for lost node");
         _waitingForLostNode = false;
         int numOfMembers = _swarm.GetMembers().Count;

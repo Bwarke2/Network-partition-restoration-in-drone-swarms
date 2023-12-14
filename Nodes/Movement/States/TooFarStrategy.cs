@@ -5,7 +5,7 @@ using UnityEngine;
 public class TooFarStrategy : IMovementStrategy
 {
     protected Node connecting_node = null;
-    private float _safe_connecting_distance = 9;
+    private float _safe_connecting_distance = 8.5f;
     private Movement _movement;
     public void SetMovement(Movement movement)
     {
