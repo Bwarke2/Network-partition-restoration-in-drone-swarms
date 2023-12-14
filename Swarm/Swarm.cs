@@ -35,6 +35,7 @@ public class Swarm : MonoBehaviour
     [SerializeField]
     private PartitionPolicy CurrentPartitionPolicy = PartitionPolicy.PRP1;
 
+    public bool Random = false;
     //UI
     public UIControl UIControl = null;
 
@@ -47,7 +48,24 @@ public class Swarm : MonoBehaviour
             JoinedNodes.Add(node.GetComponent<Node>());
         }
         timer = this.GetComponent<MyTimer>();
-        RemainingTargets.AddRange(GameObject.FindGameObjectsWithTag("Target"));
+        
+        if(Random == true)
+        {
+            RemainingTargets.AddRange(GetComponent<TargetGenerator>().GenerateRandomTargets(20));
+            GetComponent<ObstacleGenerator>().GenerateRandomObstacle(10);
+        }
+        else
+        {
+            RemainingTargets.AddRange(GameObject.FindGameObjectsWithTag("Target"));
+        }
+        
+        //Sort targets based on distance to node start position
+        RemainingTargets.Sort(delegate (GameObject a, GameObject b)
+        {
+            return Vector2.Distance(a.transform.position, FindCenterPositionOfSwarm()).CompareTo(Vector2.Distance(b.transform.position, FindCenterPositionOfSwarm()));
+        });
+
+        
         UIControl = this.GetComponent<UIControl>();
         CurrentPartitionPolicy = ChoosePartitionPolicy();
     }
