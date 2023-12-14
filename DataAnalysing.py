@@ -3,6 +3,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import math
 
+import os
+
 # Constants
 Drag_constant = 0.75
 Area = 0.25
@@ -36,45 +38,99 @@ def AddCalColums(df):
     AddEnergy(df)
     return df
 
-def GetMeans(df):
-    # Get the means of the data
+def GenerateHistogram(df, column, title, xlabel, ylabel='Frequency', bins=10):
+    # Generate a histogram
+    plt.hist(df[column], bins=bins)
+    plt.title(str('Histogram of ' + column + '_'+ title))
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.savefig(fname =('./figs/Histogram_' + column + '_' + title))
+    #plt.show()
+
+def GenerateScatterPlot(df, x, y, title, xlabel):
+    # Generate a scatter plot
+    plt.scatter(df[x], df[y])
+    plt.title(title)
+    plt.xlabel(xlabel)
+    plt.ylabel('Frequency')
+    plt.savefig(fname =('./figs/ScatterPlot_' + title))
+    #plt.show()
+
+def GenerateBoxPlot(df, column, title, ylabel):
+    # Generate a box plot
+    
+    plt.boxplot(df[column])
+    plt.title(str('Boxplot of ' + column + '_'+ title))
+    plt.ylabel(ylabel)
+    plt.savefig(fname =('./figs/BoxPlot_' + column + '_' + title))
+    #plt.show()
+
+def GeneratePlots(df, column, title, unit):
+    # Generate a histograms, scatter plot and box plot
+    GenerateHistogram(df, column, title, unit)
+    GenerateBoxPlot(df, column, title, unit)
+
+def CalculateTableData(df):
+    # Calculate the data for the table
     Time_mean = df['Time'].mean()
     Distance_mean = df['Distance'].mean()
     DistanceInMeters_mean = df['DistanceInMeters'].mean()
     E_horison_mean = df['E_horison'].mean()
     E_hover_mean = df['E_hover'].mean()
     E_total_mean = df['E_total'].mean()
-    means = [{'Time_mean', 'Distance_mean', 
-              'DistanceInMeters_mean', 
-              'E_horison_mean', 'E_hover_mean', 
-              'E_total_mean'}, 
-              {Time_mean, Distance_mean, 
-               DistanceInMeters_mean, 
-               E_horison_mean, 
-               E_hover_mean, E_total_mean}]
-    means = pd.DataFrame(means)
-    print(means)
-    return means
+    #print(df['NodesLost'])
+    NodesLost_mean = df['NodesLost'].mean()
+    P_nodeloss = 0
+    for i in range(0, len(df['NodesLost'])):
+        if df['NodesLost'].iloc[i] > 0:
+            P_nodeloss += 1
+    P_nodeloss = P_nodeloss / len(df['NodesLost'])
+    data = [[Time_mean, Distance_mean, DistanceInMeters_mean, E_horison_mean, E_hover_mean, E_total_mean, NodesLost_mean, P_nodeloss]]
+    data = pd.DataFrame(data)
+    data.columns = ['Time_mean', 'Distance_mean', 'DistanceInMeters_mean', 'E_horison_mean', 'E_hover_mean', 'E_total_mean', 'NodesLost_mean', 'P_nodeloss']
+    return data
 
-def GenerateHistogram(df, column, title, xlabel, ylabel='Frequency', bins=10):
-    # Generate a histogram
-    plt.hist(df[column], bins=bins)
-    plt.title('Histogram of ' + column)
-    plt.title(title)
-    plt.xlabel(xlabel)
-    plt.ylabel(ylabel)
-    plt.savefig(fname =('.\figs\Histogram_' + title))
-    plt.show()
+def AddMetaData(df,path):
+    # Add metadata to the dataframe
+    PRP = (path.split('\\')[-1])[0:4]
+    Scenario = (path.split('\\')[-2].split('\\')[0])[8]
+    df['PRP'] = PRP
+    df['Scenario'] = Scenario
+    return df
+
+def SaveData(df, path):
+    # Save the data to a csv file
+    if not os.path.isfile(path):
+        df.to_csv(path, sep=';', index=False, decimal=',')
+    else:
+        df.to_csv(path, mode='a', index=False, header=False)
+
+
+
+def AnalyseResultsOfPRP(path):
+    # Analyse the results
+    raw_data = read_data(path)
+    distance_data = AddDistanceInMeters(raw_data)
+    energy_data = AddEnergy(distance_data)
+    calculated_data = CalculateTableData(energy_data)
+    calculated_data = AddMetaData(calculated_data, path)
+    data_title = str('S' + calculated_data['Scenario'][0] +  calculated_data['PRP'][0])
+    print(data_title)
+    GeneratePlots(energy_data, 'Time', data_title, 'Time[s]')
+    GeneratePlots(energy_data, 'E_total', data_title, 'Energy[J]')
+    SaveData(calculated_data, '.\CompareData.csv')
+    print(calculated_data)
+    return calculated_data
+
+def AnalyseScenario(path):
+    PRP1 = AnalyseResultsOfPRP(path + '\PRP1.txt')
+    PRP2 = AnalyseResultsOfPRP(path + '\PRP2.txt')
+    PRP3 = AnalyseResultsOfPRP(path + '\PRP3.txt')
+    data = pd.concat([PRP1,PRP2])
+    data = pd.concat([data,PRP3])
+    print(data)
 
 
 # Get the data from the csv files
-raw_data = read_data('.\Assets\Results_LE\PRP1_test.txt')
-print(raw_data)
-print(raw_data.keys())
-distance_data = AddDistanceInMeters(raw_data)
-print(distance_data)
-energy_data = AddEnergy(distance_data)
-print(energy_data)
-means = GetMeans(energy_data)
-GenerateHistogram(energy_data, 'E_total', 'Histogram of E_total', 'E_total(J)', 'Frequency', 10)
-GenerateHistogram(energy_data, 'Time', 'Histogram of Time', 'Time(s)', 'Frequency', 10)
+path = '.\Results_LE\Scenario2'
+AnalyseScenario(path)
