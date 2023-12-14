@@ -9,6 +9,7 @@ public class UIControl : MonoBehaviour
     public Text timeText;
     public Text distText;
     public Text N_msg_Text;
+    public Text PRP_text;
 
     private int _targetFPS = 30;
     // Start is called before the first frame update
@@ -17,6 +18,7 @@ public class UIControl : MonoBehaviour
         QualitySettings.vSyncCount = 0;
         Application.targetFrameRate = _targetFPS;
         _swarm = GameObject.FindGameObjectWithTag("Swarm").GetComponent<Swarm>();
+        DisplayPRP(_swarm.GetPartitionPolicy());
     }
 
     // Update is called once per frame
@@ -39,6 +41,11 @@ public class UIControl : MonoBehaviour
             _swarm.Leader.GetComponent<SpriteRenderer>().material.color = Color.yellow;
             _swarm.Leader.GetComponent<SpriteRenderer>().color = Color.yellow;
         }
+    }
+
+    public void DisplayPRP(PartitionPolicy policy)
+    {
+        PRP_text.text = string.Format("PRP: {0}", policy.ToString());
     }
 
     public void DisplayTime(float timeToDisplay)
