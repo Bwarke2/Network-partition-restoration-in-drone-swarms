@@ -126,7 +126,7 @@ public class Node : MonoBehaviour
         while (true)
         {
             yield return null;
-            if (ID == _leaderElection.GetLeaderID())
+            if (ID == _leaderElection.GetLeaderID() && _heartbeat.GetNumberOfLostNodes() == 0)
                 _leaderElection.StartElection(_swarm.GetMembers());
             yield return new WaitForSeconds(20);
                 if (_leaderElection.Do_elctions == false)

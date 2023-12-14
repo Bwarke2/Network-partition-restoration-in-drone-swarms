@@ -23,7 +23,7 @@ public class HeartBeat : MonoBehaviour
     private const float max_response_time = 3;
     private Dictionary<int, float> _heart_beat_responses = new Dictionary<int, float>();
     private IEnumerator HeartBeatTimeOut_coroutine;
-    private IEnumerator NewHeartBeatTimer_coroutine;
+    private IEnumerator HB_frequence_coroutine;
 
     // Leader attributes
     [SerializeField]
@@ -38,9 +38,9 @@ public class HeartBeat : MonoBehaviour
         _this_id = this_id;
         _L_ID = L_id;
         _com = communication;
-        NewHeartBeatTimer_coroutine = NewHeartBeatTimer();
+        HB_frequence_coroutine = HB_frequence();
         HeartBeatTimeOut_coroutine = HeartBeatTimeOut();
-        StartCoroutine(NewHeartBeatTimer_coroutine);
+        StartCoroutine(HB_frequence_coroutine);
     }
 
     public void SetLeader(int L_id)
@@ -58,30 +58,33 @@ public class HeartBeat : MonoBehaviour
         _NumMembers = num_members;
     }
 
+    public int GetNumberOfLostNodes()
+    {
+        return _lost.Count;
+    }
+
     private void SendHeartBeat()
     {
         //Send HeartBeat
         //Debug.Log("Sending HeartBeat from: " + _this_id + " with term: " + _term);
         _com.BroadcastMsg<int>(MsgTypes.HeartBeatMsg, _term);
-        StartCoroutine(NewHeartBeatTimer_coroutine);
+        StartCoroutine(HB_frequence_coroutine);
     }
 
     public void HandleHeartBeatMsg(int sender_id, string value)
     {
         int term = JsonConvert.DeserializeObject<int>(value);
         //Debug.Log("HeartBeat recieved from: " + sender_id + " with term: " + term);
-        if (sender_id != _L_ID && ConnectedToLeader == ConnectedToLeader.Connected)
+        /*if (sender_id != _L_ID && ConnectedToLeader == ConnectedToLeader.Connected)
         {
             Debug.Log("HeartBeat recieved from non leader node: " + sender_id);
             //Handle other leader observed
-            return;
-        }
+        }*/
         ConnectedToLeader = ConnectedToLeader.Connected;
-        //Debug.Log("Stopping HeartBeat timeout in node: " + _this_id);
         StopCoroutine(HeartBeatTimeOut_coroutine);
         HeartBeatTimeOut_coroutine = HeartBeatTimeOut();
         StartCoroutine(HeartBeatTimeOut_coroutine);
-        _com.SendMsg<int>(MsgTypes.HeartBeatResponseMsg, _L_ID, _this_id);
+        _com.SendMsg<int>(MsgTypes.HeartBeatResponseMsg, sender_id, _this_id);
     }
 
     public void HandleBroadcastWinnerMsg(string value)
@@ -92,10 +95,9 @@ public class HeartBeat : MonoBehaviour
         SetLeader(L_id);
         _term++;
         
-        StopAllCoroutines();
-        NewHeartBeatTimer_coroutine = NewHeartBeatTimer();
-        HeartBeatTimeOut_coroutine = HeartBeatTimeOut();
-        StartCoroutine(NewHeartBeatTimer_coroutine);
+        StopCoroutine(HB_frequence_coroutine);
+        HB_frequence_coroutine = HB_frequence();
+        StartCoroutine(HB_frequence_coroutine);
         if(_L_ID == _this_id)
         {
             //Debug.Log("Stopping HeartBeat timeout in node: " + _this_id);
@@ -103,10 +105,12 @@ public class HeartBeat : MonoBehaviour
         }
     }
 
+    
+
     public void HandleLostNodeDroppedMsg(int sender_id, string value)
     {
         int num_members = JsonConvert.DeserializeObject<int>(value);
-        SetNumMembers(num_members);
+        _lost.Clear();
     }
 
     public void HandleHearthBeatResponseMsg(int Sender, string value)
@@ -187,7 +191,7 @@ public class HeartBeat : MonoBehaviour
             
     }
 
-    IEnumerator NewHeartBeatTimer()
+    IEnumerator HB_frequence()
     {
         while (true)
         {

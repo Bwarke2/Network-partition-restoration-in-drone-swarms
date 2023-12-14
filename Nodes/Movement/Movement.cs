@@ -278,7 +278,7 @@ public class Movement : MonoBehaviour
 
     public void NoSwarmMovementEvent(Node node, Transform newTarget)
     {
-        Debug.Log("No swarm movement in node " + node.name + " moving towards " + newTarget.name);
+        //Debug.Log("No swarm movement in node " + node.name + " moving towards " + newTarget.name);
         _moveStrat.HandleNoSwarmMovement(node,newTarget);
     }
 
@@ -288,6 +288,7 @@ public class Movement : MonoBehaviour
         Debug.Log("Lost node dropped in node: " + GetComponent<Node>().name + ", new NSN: " + num_of_members);
         GetComponent<Communication>().SetNSN(num_of_members);
         _max_nodes--;
+        SetWaitingForLostNode(false);
         _moveStrat.HandleLostNodeDropped(GetComponent<Node>());
     }
 

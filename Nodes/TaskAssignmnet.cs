@@ -21,15 +21,15 @@ public class TaskAssignmnet
         Swarm swarm = GameObject.FindGameObjectWithTag("Swarm").GetComponent<Swarm>();
         Unreached_Targets.Clear();
         Pursuing_Targets.Clear();
-
+        
         foreach (GameObject go in swarm.GetTargets())
             Unreached_Targets.Add(go.transform);
-
+        /*
             //Sort targets based on distance to node start position
         Unreached_Targets.Sort(delegate (Transform a, Transform b)
         {
             return Vector2.Distance(a.position, swarm.FindCenterPositionOfSwarm()).CompareTo(Vector2.Distance(b.position, swarm.FindCenterPositionOfSwarm()));
-        });
+        });*/
     }
     
 
