@@ -2437,7 +2437,7 @@ MonoBehaviour:
   Leader: {fileID: 0}
   CurrentPartitionPolicy: 2
   Random: 1
-  DoElections: 0
+  DoElections: 1
   UIControl: {fileID: 0}
 --- !u!4 &1206430551
 Transform:

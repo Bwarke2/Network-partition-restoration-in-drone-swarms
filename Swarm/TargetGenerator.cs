@@ -38,7 +38,7 @@ public class TargetGenerator : MonoBehaviour
     {
         if(Physics.CheckSphere(newposition, 2f))
         {
-            Debug.Log("Target is too close to another target");
+            //Debug.Log("Target is too close to another target");
             return null;
         }
         GameObject newTarget = Instantiate(TargetPrefab, newposition,Quaternion.identity,TargetParent);

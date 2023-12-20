@@ -1442,6 +1442,7 @@ GameObject:
   - component: {fileID: 427505837}
   - component: {fileID: 427505836}
   - component: {fileID: 427505835}
+  - component: {fileID: 427505842}
   m_Layer: 6
   m_Name: Follower (1)
   m_TagString: Node
@@ -1477,6 +1478,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: db828933407df794aa3947ee7ee0ae6b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _strategyName: 
   _target: {fileID: 0}
   Path: []
   Last_Target_Pos: {x: 0, y: 0}
@@ -1612,6 +1614,7 @@ MonoBehaviour:
   ShowTarget: {fileID: 0}
   RP: {x: 0, y: 0}
   Bat: 100
+  Do_elctions: 1
   totalDistance: 0
   NumSentMsgs: 0
   debug_node: 0
@@ -1667,6 +1670,23 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &427505842
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 427505833}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a76f2ed840ce0f469d2c9e8323ced8d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _L_ID: 0
+  _this_id: 0
+  ConnectedToLeader: 1
+  _followers: 
+  _lost: 
 --- !u!1 &492952605
 GameObject:
   m_ObjectHideFlags: 0
@@ -2238,6 +2258,7 @@ GameObject:
   - component: {fileID: 732785512}
   - component: {fileID: 732785511}
   - component: {fileID: 732785510}
+  - component: {fileID: 732785517}
   m_Layer: 6
   m_Name: Follower (3)
   m_TagString: Node
@@ -2273,6 +2294,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: db828933407df794aa3947ee7ee0ae6b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _strategyName: 
   _target: {fileID: 0}
   Path: []
   Last_Target_Pos: {x: 0, y: 0}
@@ -2408,6 +2430,7 @@ MonoBehaviour:
   ShowTarget: {fileID: 0}
   RP: {x: 0, y: 0}
   Bat: 100
+  Do_elctions: 1
   totalDistance: 0
   NumSentMsgs: 0
   debug_node: 0
@@ -2463,6 +2486,23 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &732785517
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 732785508}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a76f2ed840ce0f469d2c9e8323ced8d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _L_ID: 0
+  _this_id: 0
+  ConnectedToLeader: 1
+  _followers: 
+  _lost: 
 --- !u!1 &757972324
 GameObject:
   m_ObjectHideFlags: 0
@@ -2558,6 +2598,7 @@ GameObject:
   - component: {fileID: 876635493}
   - component: {fileID: 876635492}
   - component: {fileID: 876635491}
+  - component: {fileID: 876635498}
   m_Layer: 6
   m_Name: Node_leader
   m_TagString: Node
@@ -2593,6 +2634,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: db828933407df794aa3947ee7ee0ae6b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _strategyName: 
   _target: {fileID: 0}
   Path: []
   Last_Target_Pos: {x: 0, y: 0}
@@ -2728,6 +2770,7 @@ MonoBehaviour:
   ShowTarget: {fileID: 0}
   RP: {x: 0, y: 0}
   Bat: 100
+  Do_elctions: 1
   totalDistance: 0
   NumSentMsgs: 0
   debug_node: 0
@@ -2783,6 +2826,23 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &876635498
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 876635489}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a76f2ed840ce0f469d2c9e8323ced8d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _L_ID: 0
+  _this_id: 0
+  ConnectedToLeader: 1
+  _followers: 
+  _lost: 
 --- !u!1 &904579138
 GameObject:
   m_ObjectHideFlags: 0
@@ -3055,6 +3115,7 @@ MonoBehaviour:
   timeText: {fileID: 719236404}
   distText: {fileID: 757972326}
   N_msg_Text: {fileID: 288340652}
+  PRP_text: {fileID: 0}
 --- !u!114 &1048627359
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3090,8 +3151,11 @@ MonoBehaviour:
   RemainingTargets: []
   TotalDistance: 0
   NumSentMsgs: 0
+  TimeScale: 20
   Leader: {fileID: 0}
   CurrentPartitionPolicy: 0
+  Random: 0
+  DoElections: 1
   UIControl: {fileID: 0}
 --- !u!4 &1048627361
 Transform:
@@ -3130,6 +3194,7 @@ GameObject:
   - component: {fileID: 1102275396}
   - component: {fileID: 1102275395}
   - component: {fileID: 1102275394}
+  - component: {fileID: 1102275401}
   m_Layer: 6
   m_Name: Follower
   m_TagString: Node
@@ -3165,6 +3230,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: db828933407df794aa3947ee7ee0ae6b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _strategyName: 
   _target: {fileID: 0}
   Path: []
   Last_Target_Pos: {x: 0, y: 0}
@@ -3300,6 +3366,7 @@ MonoBehaviour:
   ShowTarget: {fileID: 0}
   RP: {x: 0, y: 0}
   Bat: 100
+  Do_elctions: 1
   totalDistance: 0
   NumSentMsgs: 0
   debug_node: 0
@@ -3355,6 +3422,23 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &1102275401
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1102275392}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a76f2ed840ce0f469d2c9e8323ced8d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _L_ID: 0
+  _this_id: 0
+  ConnectedToLeader: 1
+  _followers: 
+  _lost: 
 --- !u!1 &1145413670
 GameObject:
   m_ObjectHideFlags: 0
@@ -3490,6 +3574,7 @@ GameObject:
   - component: {fileID: 1181663064}
   - component: {fileID: 1181663063}
   - component: {fileID: 1181663062}
+  - component: {fileID: 1181663069}
   m_Layer: 6
   m_Name: Follower (2)
   m_TagString: Node
@@ -3525,6 +3610,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: db828933407df794aa3947ee7ee0ae6b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _strategyName: 
   _target: {fileID: 0}
   Path: []
   Last_Target_Pos: {x: 0, y: 0}
@@ -3660,6 +3746,7 @@ MonoBehaviour:
   ShowTarget: {fileID: 0}
   RP: {x: 0, y: 0}
   Bat: 100
+  Do_elctions: 1
   totalDistance: 0
   NumSentMsgs: 0
   debug_node: 0
@@ -3715,6 +3802,23 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &1181663069
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1181663060}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a76f2ed840ce0f469d2c9e8323ced8d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _L_ID: 0
+  _this_id: 0
+  ConnectedToLeader: 1
+  _followers: 
+  _lost: 
 --- !u!1 &1284806156
 GameObject:
   m_ObjectHideFlags: 0
@@ -5357,6 +5461,7 @@ GameObject:
   - component: {fileID: 2000108388}
   - component: {fileID: 2000108387}
   - component: {fileID: 2000108386}
+  - component: {fileID: 2000108393}
   m_Layer: 6
   m_Name: Follower (4)
   m_TagString: Node
@@ -5392,6 +5497,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: db828933407df794aa3947ee7ee0ae6b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _strategyName: 
   _target: {fileID: 0}
   Path: []
   Last_Target_Pos: {x: 0, y: 0}
@@ -5527,6 +5633,7 @@ MonoBehaviour:
   ShowTarget: {fileID: 0}
   RP: {x: 0, y: 0}
   Bat: 100
+  Do_elctions: 1
   totalDistance: 0
   NumSentMsgs: 0
   debug_node: 0
@@ -5582,6 +5689,23 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &2000108393
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2000108384}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a76f2ed840ce0f469d2c9e8323ced8d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _L_ID: 0
+  _this_id: 0
+  ConnectedToLeader: 1
+  _followers: 
+  _lost: 
 --- !u!1 &2014863088
 GameObject:
   m_ObjectHideFlags: 0
