@@ -1,4 +1,4 @@
-Time;NumMsgSent;Distance;NodesLost;NodesLost
+Time;NumMsgSent;Distance;NodesLost;Targets_left
 432,437;6839;2631,229;0;0
 197,8974;5170;1187,671;0;0
 225,4478;5404;1253,367;0;0
