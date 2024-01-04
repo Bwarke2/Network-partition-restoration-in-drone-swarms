@@ -1,4 +1,0 @@
-Date: 07/11 at commit: "Prioritation of targets added"
-S1 PRP1: Failed,
-S1 PRP2: 1:58, 2:10, 1:55, Failed(Split), 2:02
-S1 PRP3: 2:37, 2:53, Failed(One node Got stuck), 2:22, 3:09
